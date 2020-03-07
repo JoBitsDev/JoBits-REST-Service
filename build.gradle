@@ -1,0 +1,72 @@
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'war'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/javax/javaee-api
+    //Java ee
+    providedCompile group: 'javax', name: 'javaee-api', version: '6.0'
+
+    //Cargo
+    // https://mvnrepository.com/artifact/com.bmuschko/gradle-cargo-plugin
+    compile group: 'com.bmuschko', name: 'gradle-cargo-plugin', version: '2.7.1'
+    
+    //JAX-RS
+    // https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api
+    compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0.1'
+
+    
+    //Java Persistence API
+     compile group: 'org.datanucleus', name: 'javax.persistence', version: '2.2.2'
+    
+    //JDBC
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.10'
+    
+    //EclipseLink
+    // https://mvnrepository.com/artifact/org.eclipse.persistence/eclipselink
+    compile group: 'org.eclipse.persistence', name: 'eclipselink', version: '2.7.6'
+
+
+    
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core 
+    //Jackson
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.10.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.2'
+    
+
+    //Jersey
+    // Jersey core Servlet 3.x implementation
+    compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.15'
+    // https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-servlet
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.15'
+
+
+    
+    // Jersey Test Framework — Grizzly2 container
+    testCompile     'junit:junit:4.12'
+    
+}
+
+//apply plugin: 'com.bmuschko.cargo'
+//
+//cargo{
+//    cantainerId = 'tomcat8x'
+//    port = 8080
+//    
+//    deployable{
+//        context = '/jobits'
+//    }
+//    remote{
+//        hostname = 'http://51.161.33.225'
+//        username = 'tomcatadmin'
+//        password = 'Tomcat.Jobits@007'
+//    }}
+
+
+
+

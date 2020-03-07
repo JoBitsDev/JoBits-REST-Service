@@ -1,2 +1,1 @@
-# JoBits-REST-Service
-Servicio REST de la aplicacion
+Jobits Server
