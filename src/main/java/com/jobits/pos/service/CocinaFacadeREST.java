@@ -7,6 +7,7 @@ package com.jobits.pos.service;
 
 import com.jobits.pos.persistence.Cocina;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
@@ -46,6 +47,7 @@ public class CocinaFacadeREST extends AbstractFacade<Cocina> {
         for (Cocina cocina : super.findAll()) {
             ret.add(cocina.getCodCocina());
         }
+        Collections.sort(ret);
         return toJsonString(Response.Status.OK, ret);
     }
 
