@@ -7,6 +7,7 @@ package com.jobits.pos.service;
 
 import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.controllers.IPVController;
+import com.jobits.pos.persistence.Area;
 import com.jobits.pos.persistence.Carta;
 import com.jobits.pos.persistence.Mesa;
 import com.jobits.pos.persistence.ProductoVenta;
@@ -42,10 +43,10 @@ public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
     @Secured
     @GET
     @Path("PRODUCTS")
-    public Response getProductsFromArea(@QueryParam("codMesa") String id) {
-        Mesa m = em1.find(Mesa.class, id);
+    public Response getProductsFromArea(@QueryParam("codArea") String id) {
+        Area a = em1.find(Area.class, id);
         List<ProductoVenta> ret = new ArrayList<>();
-        for (Carta carta : new ArrayList<>(m.getAreacodArea().getCartaList())) {
+        for (Carta carta : new ArrayList<>(a.getCartaList())) {
             for (Seccion seccion : new ArrayList<>(carta.getSeccionList())) {
                 for (ProductoVenta p : seccion.getProductoVentaList()) {
                     if (p.getVisible()) {

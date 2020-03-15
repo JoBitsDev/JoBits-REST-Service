@@ -100,7 +100,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
             return Response.ok(token).build();
 
         } catch (CredentialException ex) {
-            return Response.status(Response.Status.FORBIDDEN).entity(ex.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND).entity(ex.getMessage()).build();
         } catch (JsonProcessingException ex) {
             return Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE).entity(ex.getMessage()).build();
         } catch (InternalServerErrorException ex) {

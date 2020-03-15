@@ -71,8 +71,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             // Valida el token con un rol
             validateToken(token, rolesSet);
 
-        } catch (CredentialException e) {
+        } catch (CredentialNotFoundException e) {
             abortWithUnauthorized(requestContext, e.getMessage());
+        } catch (CredentialException e) {
+            abortWithForbidden(requestContext, e.getMessage());
         }
     }
 
@@ -103,6 +105,18 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     }
 
     /**
+     * Este metodo para la ejecucion y devuelve un error 403 (FORBIDDEN)
+     *
+     * @param requestContext
+     */
+    private void abortWithForbidden(ContainerRequestContext requestContext, String message) {
+        requestContext.abortWith(
+                Response.status(Response.Status.FORBIDDEN)
+                        .entity(message)
+                        .build());
+    }
+
+    /**
      * Metodo para validar el token.si el metodo se ejecuta correctamente todo
      * ok. de lo contrario lanza excepcion
      *
@@ -125,7 +139,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     public static Credentials getCredentialsFromToken(String token) throws CredentialNotFoundException {
         Credentials c = PersonalFacadeREST.tokens.get(token);
         if (c == null) {
-            throw new CredentialNotFoundException("Credenciales no encontradas");
+            throw new CredentialNotFoundException("Credenciales expiradas o no encontradas");
         }
         return c;
     }
