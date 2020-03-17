@@ -6,6 +6,13 @@ repositories {
     jcenter()
 }
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies { classpath "com.bmuschko:gradle-cargo-plugin:2.7.1"  }
+}
 dependencies {
     // https://mvnrepository.com/artifact/javax/javaee-api
     //Java ee
@@ -13,7 +20,7 @@ dependencies {
 
     //Cargo
     // https://mvnrepository.com/artifact/com.bmuschko/gradle-cargo-plugin
-    compile group: 'com.bmuschko', name: 'gradle-cargo-plugin', version: '2.7.1'
+    //compile group: 'com.bmuschko', name: 'gradle-cargo-plugin', version: '2.7.1'
     
     //JAX-RS
     // https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api
@@ -21,7 +28,7 @@ dependencies {
 
     
     //Java Persistence API
-     compile group: 'org.datanucleus', name: 'javax.persistence', version: '2.2.2'
+    compile group: 'org.datanucleus', name: 'javax.persistence', version: '2.2.2'
     
     //JDBC
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.10'
@@ -52,20 +59,31 @@ dependencies {
     
 }
 
-//apply plugin: 'com.bmuschko.cargo'
-//
-//cargo{
-//    cantainerId = 'tomcat8x'
-//    port = 8080
-//    
-//    deployable{
-//        context = '/jobits'
-//    }
-//    remote{
-//        hostname = 'http://51.161.33.225'
-//        username = 'tomcatadmin'
-//        password = 'Tomcat.Jobits@007'
-//    }}
+apply plugin: 'com.bmuschko.cargo'
+
+cargo{
+    containerId = 'tomcat8x'
+    port = 8080
+    
+    deployable{
+        context = 'jobits'
+    }
+    
+    local{
+        homeDir = file('/Users/Jorge/Desktop/Desarrollo/Servidores/apache-tomcat-8.5.51')
+        outputFile = file('build/output.log')
+        startStopTimeout = 60000
+
+        containerProperties {
+            property 'cargo.tomcat.ajp.port', 8009
+        }
+    }
+    
+    remote{
+        hostname = 'http://51.161.33.225'
+        username = 'tomcatadmin'
+        password = 'Tomcat.Jobits@007'
+    }}
 
 
 
