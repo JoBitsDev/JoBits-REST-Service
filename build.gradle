@@ -70,8 +70,8 @@ cargo{
     }
     
     local{
-        homeDir = file('/Users/Jorge/Desktop/Desarrollo/Servidores/apache-tomcat-8.5.51')
-        outputFile = file('build/output.log')
+        homeDir = file(project.properties['server_location'])
+        outputFile = file(project.properties['logs_location'])
         startStopTimeout = 60000
 
         containerProperties {
