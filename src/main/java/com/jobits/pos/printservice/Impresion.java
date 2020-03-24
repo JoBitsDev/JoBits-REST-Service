@@ -58,6 +58,7 @@ public class Impresion {
     private final String DEFAULT_PRINT_LOCATION = null;
     public boolean IMPRIMIR_TICKET_COCINA = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_TICKET_EN_COCINA.getValue()).getValor() == 1;
     private static int cantidadCopias = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_CANTIDAD_COPIAS.getValue()).getValor();
+    private boolean PRINT_GASTOS_EN_AUTORIZOS = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_GASTOS_AUTORIZOS.getValue()).getValor() == 1;
 
     ArrayList<CopiaTicket> RAM = new ArrayList<>();
 
@@ -865,21 +866,31 @@ public class Impresion {
 
     }
 
-    private float addPvOrden(Ticket t, List<ProductovOrden> prods) {
+   private float addPvOrden(Ticket t, List<ProductovOrden> prods) {
         float total = 0;
         for (ProductovOrden x : prods) {
             t.alignLeft();
             t.setText(x.getCantidad() + " " + x.getProductoVenta().getNombre());
             t.newLine();
             t.alignRight();
-            if (!x.getOrden().getDeLaCasa()) {
-                t.setText(utils.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getPrecioVenta()));
-            } else {
-                t.setText(utils.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getGasto()));
+            if (SHOW_PRICES) {
+                if (x.getOrden().getDeLaCasa()) {
+                    if (PRINT_GASTOS_EN_AUTORIZOS) {
+                        t.setText(utils.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getGasto()));
+                    } else {
+                        t.setText(utils.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getPrecioVenta()));
+                    }
+                } else {
+                    t.setText(utils.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getPrecioVenta()));
+                }
+                t.newLine();
             }
-            t.newLine();
             if (x.getOrden().getDeLaCasa()) {
-                total += x.getCantidad() * x.getProductoVenta().getGasto();
+                if (PRINT_GASTOS_EN_AUTORIZOS) {
+                    total += x.getCantidad() * x.getProductoVenta().getGasto();
+                } else {
+                    total += x.getCantidad() * x.getProductoVenta().getPrecioVenta();
+                }
             } else {
                 total += x.getCantidad() * x.getProductoVenta().getPrecioVenta();
             }

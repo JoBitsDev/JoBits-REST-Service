@@ -55,7 +55,7 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static final int MAJOR_VERSION = 5;
+    public static final int MAJOR_VERSION = 6;
     
     public static final int MINOR_VERSION = 0;
 

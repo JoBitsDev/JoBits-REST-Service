@@ -96,7 +96,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Secured
     @GET
     @Path("VALIDATE")
-    public Response isValid(@QueryParam("codOrden") String codOrden) {
+    public Response isValid(@QueryParam("codOrden") String codOrden, @QueryParam("codMesa") String codMesa) {
         Orden o = super.find(codOrden);
 
         if (o != null) {
@@ -115,6 +115,14 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                 return toJsonString(Response.Status.OK, "Orden validada");
             }
         } else {
+            Mesa m = getEntityManager().find(Mesa.class, codMesa);
+            m.setEstado(ESTADO_MESA_VACIA);
+            em1.getTransaction().begin();
+            em1.merge(m);
+            em1.flush();
+            if (em1.getTransaction().isActive()) {
+                em1.getTransaction().commit();
+            }
             return toJsonString(Response.Status.GONE, "La orden se elimino de manera inesperada");
         }
     }
