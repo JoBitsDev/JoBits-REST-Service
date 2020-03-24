@@ -53,7 +53,6 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
     private EntityManager em;
 
-    public static HashMap<String, Credentials> tokens = new HashMap<>();
 
     public PersonalFacadeREST() {
         super(Personal.class);

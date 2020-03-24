@@ -5,6 +5,7 @@
  */
 package com.jobits.pos.authentication;
 
+import com.jobits.pos.service.AbstractFacade;
 import com.jobits.pos.service.PersonalFacadeREST;
 import java.io.IOException;
 import java.util.Arrays;
@@ -137,7 +138,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     }
 
     public static Credentials getCredentialsFromToken(String token) throws CredentialNotFoundException {
-        Credentials c = PersonalFacadeREST.tokens.get(token);
+        Credentials c = AbstractFacade.tokens.get(token);
         if (c == null) {
             throw new CredentialNotFoundException("Credenciales expiradas o no encontradas");
         }

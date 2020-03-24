@@ -7,6 +7,7 @@ package com.jobits.pos.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobits.pos.authentication.Credentials;
 import com.jobits.pos.persistence.Venta;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ public abstract class AbstractFacade<T> {
 
     private Class<T> entityClass;
 
+    public static HashMap<String, Credentials> tokens = new HashMap<>();
     protected EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
     protected EntityManager em1 = e.createEntityManager();
 
@@ -133,7 +135,7 @@ public abstract class AbstractFacade<T> {
 
     protected Response handleException(Exception ex) {
         if (ex instanceof JsonProcessingException) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte" +((JsonProcessingException) ex).getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte" + ((JsonProcessingException) ex).getMessage()).build();
         }
         System.out.println(ex.getStackTrace()[0]);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Contacte con soporte " + ex.getMessage()).build();
@@ -150,7 +152,7 @@ public abstract class AbstractFacade<T> {
     protected String getToken(HttpServletRequest requestContext) {
         return requestContext.getHeader(HttpHeaders.AUTHORIZATION).substring("Bearer".length()).trim();
     }
-    
+
     protected void startTransaction() {
         if (!getEntityManager().getTransaction().isActive()) {
             getEntityManager().getTransaction().begin();
