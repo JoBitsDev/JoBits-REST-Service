@@ -9,6 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.Credentials;
 import com.jobits.pos.persistence.Venta;
+import com.jobits.pos.persistence.pasarela.Token;
+import com.jobits.pos.persistence.repository.DatabaseRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,7 +36,10 @@ public abstract class AbstractFacade<T> {
     private Class<T> entityClass;
 
     public static HashMap<String, Credentials> tokens = new HashMap<>();
-    protected EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
+    public static HashMap<String, Token> tennantTokens = new HashMap<>();
+    
+    public static EntityManagerFactory currentTennant = DatabaseRepository.getDefaultFactory();
+    protected EntityManagerFactory e = currentTennant;
     protected EntityManager em1 = e.createEntityManager();
 
     public AbstractFacade(Class<T> entityClass) {
@@ -100,6 +105,12 @@ public abstract class AbstractFacade<T> {
         cq.select(cq.from(entity));
         return em1.createQuery(cq).getResultList();
 
+    }
+
+    public static List findAll(EntityManager em, Class entity) {
+        javax.persistence.criteria.CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(entity));
+        return em.createQuery(cq).getResultList();
     }
 
     public List<T> findRange(int[] range) {
