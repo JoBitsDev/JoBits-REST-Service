@@ -16,6 +16,7 @@ import com.jobits.pos.persistence.Personal;
 import com.jobits.pos.persistence.ProductovOrden;
 import com.jobits.pos.persistence.Transaccion;
 import com.jobits.pos.persistence.Venta;
+import com.jobits.pos.service.AbstractFacade;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,18 +48,18 @@ public class Impresion {
      * @param args the command line arguments
      */
     private boolean MONEDA_CUC;
-    private final boolean REDONDEO_POR_EXCESO = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_REDONDEO_EXCESO.getValue()).getValor() == 1;
+    private final boolean REDONDEO_POR_EXCESO = AbstractFacade.currentTennant.createEntityManager().find(Configuracion.class, R.SettingID.IMPRESION_REDONDEO_EXCESO.getValue()).getValor() == 1;
     private static EstadoImpresion estadoImpresion = EstadoImpresion.UKNOWN;
     private boolean SHOW_PRICES = true;
-    public static boolean SHOW_HEADER = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_TICKET_ENCABEZADO_RESTAURANTE.getValue()).getValor() == 1;
-    public static boolean SHOW_SUBTOTAL = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_TICKET_SUBTOTAL.getValue()).getValor() == 1;
-    private final boolean PRINT_IN_CENTRAL_KITCHEN = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_COCINA_CENTRAL.getValue()).getValor() == 1;
-    private final boolean PRINT_SECOND_COIN = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_MONEDA_SECUNDARIA.getValue()).getValor() == 1;
+    public static boolean SHOW_HEADER = AbstractFacade.currentTennant.createEntityManager().find(Configuracion.class, R.SettingID.IMPRESION_TICKET_ENCABEZADO_RESTAURANTE.getValue()).getValor() == 1;
+    public static boolean SHOW_SUBTOTAL = AbstractFacade.currentTennant.createEntityManager().find(Configuracion.class, R.SettingID.IMPRESION_TICKET_SUBTOTAL.getValue()).getValor() == 1;
+    private final boolean PRINT_IN_CENTRAL_KITCHEN = AbstractFacade.currentTennant.createEntityManager().find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_COCINA_CENTRAL.getValue()).getValor() == 1;
+    private final boolean PRINT_SECOND_COIN = AbstractFacade.currentTennant.createEntityManager().find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_MONEDA_SECUNDARIA.getValue()).getValor() == 1;
     private final String DEFAULT_KITCHEN_PRINTER_LOCATION = "Cocina";
     private final String DEFAULT_PRINT_LOCATION = null;
-    public boolean IMPRIMIR_TICKET_COCINA = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_TICKET_EN_COCINA.getValue()).getValor() == 1;
-    private static int cantidadCopias = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_CANTIDAD_COPIAS.getValue()).getValor();
-    private boolean PRINT_GASTOS_EN_AUTORIZOS = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_GASTOS_AUTORIZOS.getValue()).getValor() == 1;
+    public boolean IMPRIMIR_TICKET_COCINA = AbstractFacade.currentTennant.createEntityManager().find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_TICKET_EN_COCINA.getValue()).getValor() == 1;
+    private static int cantidadCopias = AbstractFacade.currentTennant.createEntityManager().find(Configuracion.class, R.SettingID.IMPRESION_CANTIDAD_COPIAS.getValue()).getValor();
+    private boolean PRINT_GASTOS_EN_AUTORIZOS = AbstractFacade.currentTennant.createEntityManager().find(Configuracion.class, R.SettingID.IMPRESION_IMPRIMIR_GASTOS_AUTORIZOS.getValue()).getValor() == 1;
 
     ArrayList<CopiaTicket> RAM = new ArrayList<>();
 
@@ -206,7 +207,7 @@ public class Impresion {
      */
     public Orden printKitchen(Orden o) {
         if (PRINT_IN_CENTRAL_KITCHEN) {
-            return printKitchenForced(printKitchen(printCancelationTicket(o), R.em1.find(Cocina.class, "C-2"), ""));
+            return printKitchenForced(printKitchen(printCancelationTicket(o), AbstractFacade.currentTennant.createEntityManager().find(Cocina.class, "C-2"), ""));
         } else {
             printCancelationTicket(o);
             Ticket t = new Ticket();
@@ -247,7 +248,7 @@ public class Impresion {
 
     public Orden printCancelationTicket(Orden o) {
         if (PRINT_IN_CENTRAL_KITCHEN) {
-            return printCancelationKitchenForced(printCancelationKitchen(o, R.em1.find(Cocina.class, "C-2")));
+            return printCancelationKitchenForced(printCancelationKitchen(o, AbstractFacade.currentTennant.createEntityManager().find(Cocina.class, "C-2")));
         } else {
             Ticket t = new Ticket();
 
@@ -408,7 +409,7 @@ public class Impresion {
                 x.setEnviadosacocina(x.getCantidad());
             }
             try {
-                R.em1.merge(x);
+                AbstractFacade.currentTennant.createEntityManager().merge(x);
             } catch (Exception ex) {
                 Logger.getLogger(Impresion.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -487,7 +488,7 @@ public class Impresion {
             }
             try {
 
-                R.em1.merge(x);
+                AbstractFacade.currentTennant.createEntityManager().merge(x);
             } catch (Exception ex) {
                 Logger.getLogger(Impresion.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -586,7 +587,7 @@ public class Impresion {
                 t.alignLeft();
                 x.setEnviadosacocina(x.getCantidad());
                 try {
-                    R.em1.merge(x);
+                    AbstractFacade.currentTennant.createEntityManager().merge(x);
                 } catch (Exception ex) {
                     Logger.getLogger(Impresion.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -1057,7 +1058,7 @@ public class Impresion {
                 t.alignLeft();
                 x.setEnviadosacocina(x.getCantidad());
                 try {
-                    R.em1.merge(x);
+                    AbstractFacade.currentTennant.createEntityManager().merge(x);
                 } catch (Exception ex) {
                     Logger.getLogger(Impresion.class.getName()).log(Level.SEVERE, null, ex);
                 }

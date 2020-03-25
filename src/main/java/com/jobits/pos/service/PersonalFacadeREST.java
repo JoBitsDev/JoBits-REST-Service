@@ -67,7 +67,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     public Response findActiveUsers() {
         ArrayList<String> aux = new ArrayList<>();
 
-        for (Orden x : supeAbstractFacade.currentTennant.createEntityManager().find(Venta.class, findVenta().getFecha()).getOrdenList()) {
+        for (Orden x : super.em1.find(Venta.class, findVenta().getFecha()).getOrdenList()) {
             String nombre = x.getPersonalusuario().getUsuario();
             if (!aux.contains(nombre)) {
                 aux.add(nombre);

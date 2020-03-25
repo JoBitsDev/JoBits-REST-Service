@@ -31,7 +31,7 @@ public class GeneralFacadeREST extends AbstractFacade<Carta> {
     @Path("INFO")
     public Response getMonedas() {
         HashMap<String, Object> ret = new HashMap<>();
-        Negocio n = R.em1.find(Negocio.class, 1);
+        Negocio n = AbstractFacade.currentTennant.createEntityManager().find(Negocio.class, 1);
         ret.put("nombre", n.getNombre());
         ret.put("monedaPrincipal", " " + n.getMonedaPrincipal());
         String secundaria = n.getMonedaPrincipal().equals("CUC") ? " MN" : " CUC";
