@@ -5,6 +5,8 @@
  */
 package com.jobits.pos.authentication;
 
+import com.jobits.pos.persistence.pasarela.Token;
+import com.jobits.pos.persistence.repository.DatabaseRepository;
 import com.jobits.pos.service.AbstractFacade;
 import com.jobits.pos.service.PersonalFacadeREST;
 import java.io.IOException;
@@ -39,6 +41,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     private ResourceInfo resourceInfo;
 
     private static final String AUTHENTICATION_SCHEME = "Bearer";
+    private static final String TENANT_SCHEME = "TennantId";
 
     /**
      * esto es lo que se ejecuta antes de entrar en cualquier metodo que este
@@ -53,6 +56,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // Obtiene el header para parsear el token
         String authorizationHeader
                 = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+        String tennantHeader
+                = requestContext.getHeaderString(HttpHeaders.LOCATION);
 
         // Chequea que el header para ver si no esta vacio
         if (!isTokenBasedAuthentication(authorizationHeader)) {
@@ -60,11 +65,25 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             return;
         }
 
+        //Chequea si existe un tennant
+        if (!isTennantBaseAuthentication(tennantHeader)) {
+            abortWithUnauthorized(requestContext, "No existe ruta a la base de datos");
+            return;
+        }
+
         // Obtiene el token
         String token = authorizationHeader
                 .substring(AUTHENTICATION_SCHEME.length()).trim();
 
+        //Obtiene el tennant
+        String tennant = authorizationHeader
+                .substring(TENANT_SCHEME.length()).trim();
+
         try {
+
+            //valida el tennant
+            Token t = validateTennantToken(tennant);
+            AbstractFacade.currentTennant = DatabaseRepository.getFactoryFrom(t.getCuenta());
 
             //obtiene el rol que se puede anotar a un metodo
             List<String> rolesSet = Arrays.asList(resourceInfo.getResourceMethod().getAnnotation(RolesAllowed.class).value());
@@ -141,6 +160,37 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         Credentials c = AbstractFacade.tokens.get(token);
         if (c == null) {
             throw new CredentialNotFoundException("Credenciales expiradas o no encontradas");
+        }
+        return c;
+    }
+
+    /**
+     * Chequea si el header es valido. Esto se cumple si: - No debe ser nulo -
+     * Debe tener en el encabezado "TennantId" mas un espacio en blanco. - el
+     * token es case-insentivie.(da lo mismo que en mayuscula que en minuscula).
+     *
+     * @param authorizationHeader
+     * @return
+     */
+    private boolean isTennantBaseAuthentication(String tennantHeader) {
+        // 
+        return tennantHeader != null && tennantHeader.toLowerCase()
+                .startsWith(TENANT_SCHEME.toLowerCase() + " ");
+    }
+
+    /**
+     * Metodo para validar el token.si el metodo se ejecuta correctamente todo
+     * ok. de lo contrario lanza excepcion
+     *
+     * @param token el token por parametro
+     * @param roleSet la lista de roles que tiene como anotacion el metodo que
+     * se ejecutara despues
+     * @throws CredentialException
+     */
+    private Token validateTennantToken(String tennantToken) throws CredentialNotFoundException {
+          Token c = AbstractFacade.tennantTokens.get(tennantToken);
+        if (c == null) {
+            throw new CredentialNotFoundException("Credenciales de base de datos expiradas o no encontradas");
         }
         return c;
     }

@@ -13,6 +13,9 @@ import com.jobits.pos.persistence.Personal;
 import com.jobits.pos.persistence.Venta;
 import com.jobits.pos.authentication.Credentials;
 import com.jobits.pos.authentication.Secured;
+import com.jobits.pos.persistence.pasarela.Cuenta;
+import com.jobits.pos.persistence.pasarela.Token;
+import com.jobits.pos.persistence.repository.DatabaseRepository;
 import com.jobits.utils.utils;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -53,7 +56,6 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     @PersistenceContext(unitName = "Restaurant_Manager_Web_ServicePU")
     private EntityManager em;
 
-
     public PersonalFacadeREST() {
         super(Personal.class);
     }
@@ -65,7 +67,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     public Response findActiveUsers() {
         ArrayList<String> aux = new ArrayList<>();
 
-        for (Orden x : super.em1.find(Venta.class, findVenta().getFecha()).getOrdenList()) {
+        for (Orden x : supeAbstractFacade.currentTennant.createEntityManager().find(Venta.class, findVenta().getFecha()).getOrdenList()) {
             String nombre = x.getPersonalusuario().getUsuario();
             if (!aux.contains(nombre)) {
                 aux.add(nombre);
@@ -107,6 +109,36 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         }
     }
 
+    @POST
+    @Path("GET-TENNANT")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public Response getTenant(String credential) {
+        try {
+
+            ObjectMapper mapper = new JsonMapper();
+            Credentials credentials = mapper.readValue(credential, Credentials.class);
+
+            String username = credentials.getUsername();
+            String password = credentials.getPassword();
+
+            // Authenticate the user using the credentials provided
+            Cuenta c = authenticateTennant(username, password);
+
+            // Issue a token for the user
+            String token = issueTennantToken(c);
+
+            // Return the token on the response
+            return Response.ok(token).build();
+
+        } catch (CredentialException ex) {
+            return Response.status(Response.Status.NOT_FOUND).entity(ex.getMessage()).build();
+        } catch (JsonProcessingException ex) {
+            return Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE).entity(ex.getMessage()).build();
+        } catch (InternalServerErrorException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        }
+    }
+
     @Override
     protected EntityManager getEntityManager() {
         return em;
@@ -134,8 +166,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         // Issue a token (can be a random String persisted to a database or a JWT token)
         // The issued token must be associated to a user
         // Return the issued token
-        Random random = new SecureRandom();
-        String token = new BigInteger(121, random).toString(32);
+        String token = generateToken();
         for (String s : tokens.keySet()) {
             if (tokens.get(s).getUsername().equals(credentials.getUsername())) {
                 return s;
@@ -143,6 +174,47 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         }
         tokens.put(token, credentials);
         return token;
+    }
+
+    private Cuenta authenticateTennant(String username, String password) throws CredentialException {
+        List<Cuenta> list = super.findAll(Cuenta.class);
+        for (Cuenta x : list) {
+            if (x.getUsuario().equals(username)) {
+                if (utils.getSHA256(x.getContrasena()).equals(password)) {
+                    if (!x.getActiva()) {
+                        return x;
+                    } else {
+                        throw new CredentialExpiredException("Usuario en linea");
+                    }
+                }
+                throw new CredentialException("Credenciales de base de datos incorrectas");
+            }
+        }
+        throw new CredentialNotFoundException("Credenciales de base de datos no encontradas");
+    }
+
+    private String issueTennantToken(Cuenta c) {
+        // Issue a token (can be a random String persisted to a database or a JWT token)
+        // The issued token must be associated to a user
+        // Return the issued token
+        String token = generateToken();
+        List<Token> pasarela_tokens = findAll(Token.class);
+        for (Token t : pasarela_tokens) {
+            if (t.getCuenta().equals(c)) {
+                return t.getToken();
+            }
+        }
+        Token newToken = new Token();
+        newToken.setCuenta(c);
+        newToken.setToken(token);
+        getEntityManager().persist(newToken);
+        tennantTokens.put(token, newToken);
+        return token;
+    }
+
+    private String generateToken() {
+        Random random = new SecureRandom();
+        return new BigInteger(121, random).toString(32);
     }
 
 }
