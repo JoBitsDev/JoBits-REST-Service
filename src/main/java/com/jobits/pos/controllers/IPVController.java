@@ -42,22 +42,8 @@ public class IPVController extends AbstractController {
         return cantidadMinima == Integer.MAX_VALUE ? 0 : cantidadMinima;
     }
 
-    public void consumir(ProductovOrden productoVenta, float cantidad) throws PersistenceException{
-        List<IpvRegistro> updateList = new ArrayList<>();
-        for (ProductoInsumo productoInsumo : productoVenta.getProductoVenta().getProductoInsumoList()) {
-            IpvRegistro registro
-                    = getIpvRegistro(productoVenta.getProductoVenta().getCocinacodCocina(),
-                            productoVenta.getOrden().getVentafecha().getFecha(),
-                            productoInsumo.getInsumo());
-            if (registro != null) {
-                float cantidadaRebajar = productoInsumo.getCantidad() * cantidad;
-                registro.setConsumo(registro.getConsumo() + cantidadaRebajar);
-                updateList.add(registro);
-            }
-        }
-        for (IpvRegistro registro : updateList) {
-            updateInstance(registro);
-        }
+    public void consumir(ProductovOrden productoVenta, float cantidad) throws PersistenceException {
+        consumirIpvRegistro(productoVenta, cantidad);
         IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
         IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
         if (ipvVenta != null) {
@@ -67,6 +53,7 @@ public class IPVController extends AbstractController {
     }
 
     public void consumirPorLaCasa(ProductovOrden productoVenta, float cantidad) {
+        consumirIpvRegistro(productoVenta, cantidad);
         IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
         IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
         if (ipvVenta != null) {
@@ -103,6 +90,7 @@ public class IPVController extends AbstractController {
     }
 
     public void devolverPorLaCasa(ProductovOrden productoVenta, float diferencia) {
+        devolverIpvRegistro(productoVenta, diferencia);
         IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
         IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
         if (ipvVenta != null) {
@@ -112,21 +100,7 @@ public class IPVController extends AbstractController {
     }
 
     public void devolver(ProductovOrden productoVenta, float diferencia) {
-        List<IpvRegistro> updateList = new ArrayList<>();
-        for (ProductoInsumo productoInsumo : productoVenta.getProductoVenta().getProductoInsumoList()) {
-            IpvRegistro registro
-                    = getIpvRegistro(productoVenta.getProductoVenta().getCocinacodCocina(),
-                            productoVenta.getOrden().getVentafecha().getFecha(),
-                            productoInsumo.getInsumo());
-            if (registro != null) {
-                float cantidadaRebajar = productoInsumo.getCantidad() * diferencia;
-                registro.setConsumo(registro.getConsumo() - cantidadaRebajar);
-                updateList.add(registro);
-            }
-        }
-        for (IpvRegistro registro : updateList) {
-            updateInstance(registro);
-        }
+        devolverIpvRegistro(productoVenta, diferencia);
         IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
         IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
         if (ipvVenta != null) {
@@ -232,6 +206,45 @@ public class IPVController extends AbstractController {
         }
         return true;
 
+    }
+
+    //
+    // Metodos Privados
+    //
+    private void consumirIpvRegistro(ProductovOrden productoVenta, float cantidad) {
+        List<IpvRegistro> updateList = new ArrayList<>();
+        for (ProductoInsumo productoInsumo : productoVenta.getProductoVenta().getProductoInsumoList()) {
+            IpvRegistro registro
+                    = getIpvRegistro(productoVenta.getProductoVenta().getCocinacodCocina(),
+                            productoVenta.getOrden().getVentafecha().getFecha(),
+                            productoInsumo.getInsumo());
+            if (registro != null) {
+                float cantidadaRebajar = productoInsumo.getCantidad() * cantidad;
+                registro.setConsumo(registro.getConsumo() + cantidadaRebajar);
+                updateList.add(registro);
+            }
+        }
+        for (IpvRegistro registro : updateList) {
+            updateInstance(registro);
+        }
+    }
+
+    private void devolverIpvRegistro(ProductovOrden productoVenta, float cantidad) {
+        List<IpvRegistro> updateList = new ArrayList<>();
+        for (ProductoInsumo productoInsumo : productoVenta.getProductoVenta().getProductoInsumoList()) {
+            IpvRegistro registro
+                    = getIpvRegistro(productoVenta.getProductoVenta().getCocinacodCocina(),
+                            productoVenta.getOrden().getVentafecha().getFecha(),
+                            productoInsumo.getInsumo());
+            if (registro != null) {
+                float cantidadaRebajar = productoInsumo.getCantidad() * cantidad;
+                registro.setConsumo(registro.getConsumo() - cantidadaRebajar);
+                updateList.add(registro);
+            }
+        }
+        for (IpvRegistro registro : updateList) {
+            updateInstance(registro);
+        }
     }
 
 }
