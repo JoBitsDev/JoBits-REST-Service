@@ -23,9 +23,10 @@ public class DatabaseRepository {
 
     private static final String PU_DEFAULT_NAME = "pasarela_loggeo";
     private static final HashMap<String, String> PU_DEFAULT_PROPERTIES = getDefaultProperties();
-
+    private static final EntityManagerFactory DEFAULT_EMF = Persistence.createEntityManagerFactory(PU_DEFAULT_NAME, PU_DEFAULT_PROPERTIES);
+    
     public static EntityManagerFactory getDefaultFactory() {
-        return Persistence.createEntityManagerFactory(PU_DEFAULT_NAME, PU_DEFAULT_PROPERTIES);
+        return DEFAULT_EMF;
     }
 
     public static EntityManager getDefaultConnection() {
