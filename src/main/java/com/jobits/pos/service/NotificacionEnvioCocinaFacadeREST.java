@@ -54,9 +54,9 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
         List<NotificacionEnvioCocina> all = findAll();
         for (NotificacionEnvioCocina x : all) {
             if (x.getProductovOrden().getOrden().getHoraTerminada() != null) {
-                em1.getTransaction().begin();
+                getEntityManager().getTransaction().begin();
                 super.remove(x);
-                em1.getTransaction().commit();
+                getEntityManager().getTransaction().commit();
                 continue;
             }
             if (x.getCocina().getCodCocina().equals(codCocina)) {
@@ -87,10 +87,10 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
                     && x.getNotificacionEnvioCocinaPK().getProductovOrdenproductoVentapCod().equals(codProducto)) {
                 x.getProductovOrden().setListoParaRecoger(Boolean.TRUE);
                 x.getProductovOrden().setEnviadosacocina(x.getProductovOrden().getCantidad());
-                super.em1.getTransaction().begin();
-                super.em1.merge(x.getProductovOrden());
-                super.em1.getTransaction().commit();
-                super.remove(x);
+                getEntityManager().getTransaction().begin();
+                getEntityManager().merge(x.getProductovOrden());
+                getEntityManager().getTransaction().commit();
+                remove(x);
                 new Notificador(x.getIpDependiente(), new Notificable() {
                     @Override
                     public String getMensajeNotificacion() {
@@ -115,14 +115,10 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
                 + "o el receptor no esta conectado");
     }
 
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
-    }
 
     private void registerDevice(HttpServletRequest inRequest, String cod_cocina) {
         boolean founded = false;
-        Cocina c = em1.find(Cocina.class, cod_cocina);
+        Cocina c = getEntityManager().find(Cocina.class, cod_cocina);
         Impresora imp = null;
         String host = inRequest.getRemoteHost();
         for (Impresora i : c.getImpresoraList()) {
@@ -139,13 +135,13 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
             i.setIpImpresora(host);
             i.setNombreImpresora("Device");
             i.setCodImpresora("D-" + c.getCodCocina());
-            em1.getTransaction().begin();
-            em1.persist(i);
-            em1.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().persist(i);
+            getEntityManager().getTransaction().commit();
         } else {
-            em1.getTransaction().begin();
-            em1.merge(imp);
-            em1.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().merge(imp);
+            getEntityManager().getTransaction().commit();
         }
     }
 

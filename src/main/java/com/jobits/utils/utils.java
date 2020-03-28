@@ -192,7 +192,7 @@ public class utils {
         if (ref != 0) {
             valorConvertidoEntero += 5 - ref;
         }
-        return R.formatoMoneda.format((float) valorConvertidoEntero / 100) + R.COIN_SUFFIX;
+        return R.formatoMoneda.format((float) valorConvertidoEntero / 100) + R.getCoinSuffix();
     }
 
     /**
@@ -209,7 +209,7 @@ public class utils {
         if (ref != 0) {
             valorConvertidoEntero += 5 - ref;
         }
-        return R.formatoMoneda.format((float) valorConvertidoEntero / 100) + R.COIN_SUFFIX;
+        return R.formatoMoneda.format((float) valorConvertidoEntero / 100) + R.getCoinSuffix();
     }
 
     /**
@@ -220,7 +220,7 @@ public class utils {
      * @return
      */
     public static String setDosLugaresDecimales(float valorARedondear) {
-        return Math.round(valorARedondear * Math.pow(10, 2)) / Math.pow(10, 2) + R.COIN_SUFFIX;
+        return Math.round(valorARedondear * Math.pow(10, 2)) / Math.pow(10, 2) + R.getCoinSuffix();
     }
 
     /**
