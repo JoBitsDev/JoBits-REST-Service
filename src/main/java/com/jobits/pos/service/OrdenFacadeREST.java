@@ -86,9 +86,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setOrdenvalorMonetario(Float.valueOf("0"));
         o.setPorciento(m.getAreacodArea().getPorcientoPorServicio().floatValue());
 
-        em1.getTransaction().begin();
+        getEntityManager().getTransaction().begin();
         super.create(o);
-        em1.getTransaction().commit();
+        getEntityManager().getTransaction().commit();
         return toJsonString(Response.Status.OK, o);
     }
 
@@ -104,11 +104,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                 Mesa m = o.getMesacodMesa();
                 m.setEstado(ESTADO_MESA_VACIA);
 
-                em1.getTransaction().begin();
-                em1.merge(m);
-                em1.flush();
-                if (em1.getTransaction().isActive()) {
-                    em1.getTransaction().commit();
+                getEntityManager().getTransaction().begin();
+                getEntityManager().merge(m);
+                getEntityManager().flush();
+                if (getEntityManager().getTransaction().isActive()) {
+                    getEntityManager().getTransaction().commit();
                 }
                 return toJsonString(Response.Status.GONE, "La mesa ya no se encuentra abierta");
             } else {
@@ -117,11 +117,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         } else {
             Mesa m = getEntityManager().find(Mesa.class, codMesa);
             m.setEstado(ESTADO_MESA_VACIA);
-            em1.getTransaction().begin();
-            em1.merge(m);
-            em1.flush();
-            if (em1.getTransaction().isActive()) {
-                em1.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().merge(m);
+            getEntityManager().flush();
+            if (getEntityManager().getTransaction().isActive()) {
+                getEntityManager().getTransaction().commit();
             }
             return toJsonString(Response.Status.GONE, "La orden se elimino de manera inesperada");
         }
@@ -258,7 +258,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
 
         for (ProductovOrden x : o.getProductovOrdenList()) {
 
-            if (R.TABLETS_EN_COCINA) {
+            if (R.existenTabletEnCocina()) {
                 if (!x.getNotificacionEnvioCocinaList().isEmpty()) {
                     return toJsonString(Response.Status.PRECONDITION_FAILED, "Existen Productos que faltan por enviar a elaborar. Envie a elaborar");
                 }
@@ -280,11 +280,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setOrdengastoEninsumos(calcularGastoTotal(o));
         o.setOrdenvalorMonetario(calcularValorTotal(o));
 
-        em1.getTransaction().begin();
-        em1.merge(m);
-        em1.flush();
-        if (em1.getTransaction().isActive()) {
-            em1.getTransaction().commit();
+        getEntityManager().getTransaction().begin();
+        getEntityManager().merge(m);
+        getEntityManager().flush();
+        if (getEntityManager().getTransaction().isActive()) {
+            getEntityManager().getTransaction().commit();
         }
         super.edit(o);
 
@@ -299,7 +299,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Orden o = super.find(codOrden);
         Mesa m = getEntityManager().find(Mesa.class, o.getMesacodMesa().getCodMesa());
         boolean notificacionEnviada = true;
-        if (R.TABLETS_EN_COCINA) {
+        if (R.existenTabletEnCocina()) {
             notificacionEnviada = false;
             for (ProductovOrden x : o.getProductovOrdenList()) {
                 if (x.getEnviadosacocina() < x.getCantidad()) {
@@ -307,7 +307,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     notPK.setCocinacodCocina(x.getProductoVenta().getCocinacodCocina().getCodCocina());
                     notPK.setProductovOrdenordencodOrden(o.getCodOrden());
                     notPK.setProductovOrdenproductoVentapCod(x.getProductoVenta().getPCod());
-                    NotificacionEnvioCocina not = super.em1.find(NotificacionEnvioCocina.class, notPK);
+                    NotificacionEnvioCocina not = super.getEntityManager().find(NotificacionEnvioCocina.class, notPK);
                     boolean exist = true;
                     if (not == null) {
                         not = new NotificacionEnvioCocina(notPK);
@@ -317,20 +317,20 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     not.setHoraNotificacion(new Date());
                     not.setProductovOrden(x);
                     not.setIpDependiente(inRequest.getRemoteHost());
-                    super.em1.getTransaction().begin();
+                    super.getEntityManager().getTransaction().begin();
                     if (exist) {
                         not.setCantidad(not.getCantidad() + (x.getCantidad() - x.getEnviadosacocina()));
-                        super.em1.merge(not);
+                        super.getEntityManager().merge(not);
                     } else {
                         not.setCantidad(x.getCantidad() - x.getEnviadosacocina());
-                        super.em1.persist(not);
+                        super.getEntityManager().persist(not);
                     }
 
                     notificacionEnviada = enviarNotificacion(not);
                     //if (enviarNotificacion(not)) {
-                    super.em1.getTransaction().commit();
+                    super.getEntityManager().getTransaction().commit();
                     //} else {
-                    //  super.em1.getTransaction().rollback();
+                    //  super.getEntityManager().getTransaction().rollback();
                     // }
                     if (!Impresion.getDefaultInstance().IMPRIMIR_TICKET_COCINA) {
                         x.setEnviadosacocina(x.getCantidad());
@@ -385,10 +385,10 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             }
 
         }
-        em1.getTransaction().begin();
-        em1.merge(pv.getNota());
-        em1.merge(pv);
-        em1.getTransaction().commit();
+        getEntityManager().getTransaction().begin();
+        getEntityManager().merge(pv.getNota());
+        getEntityManager().merge(pv);
+        getEntityManager().getTransaction().commit();
         super.edit(o);
 
         return toJsonString(Response.Status.OK, "Notificacion exitosa");
@@ -462,9 +462,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             }
         }
 
-        em1.getTransaction().begin();
-        em1.merge(pv);
-        em1.getTransaction().commit();
+        getEntityManager().getTransaction().begin();
+        getEntityManager().merge(pv);
+        getEntityManager().getTransaction().commit();
         super.edit(o);
         return toJsonString(Response.Status.OK, "Exito");
 
@@ -571,11 +571,6 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         getEntityManager().persist(c);
         String r = "O-" + ret;
         return toJsonString(Response.Status.OK, r);
-    }
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em1;
     }
 
     private String ajustarNoOrden() {

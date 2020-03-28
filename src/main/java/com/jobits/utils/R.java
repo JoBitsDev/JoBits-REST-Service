@@ -9,6 +9,7 @@ import com.jobits.pos.persistence.Configuracion;
 import com.jobits.pos.persistence.Negocio;
 import com.jobits.pos.printservice.Impresion;
 import com.jobits.pos.printservice.Ticket;
+import com.jobits.pos.service.AbstractFacade;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,26 +25,37 @@ import javax.persistence.Persistence;
  */
 public class R {
 
-    public static final EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
-    public static final EntityManager em1 = e.createEntityManager();
+    public static boolean existenTabletEnCocina() {
+        return AbstractFacade.getCurrentTennantConnection().
+                find(Configuracion.class, R.SettingID.GENERAL_TABLET_COCINA.
+                        getValue()).getValor() == 1;
+    }
 
-    public static boolean TABLETS_EN_COCINA = R.em1.find(Configuracion.class, R.SettingID.GENERAL_TABLET_COCINA.getValue()).getValor() == 1;
+    public static String getRestName() {
+        return AbstractFacade.getCurrentTennantConnection().find(Negocio.class, 1).getNombre();
+    }
+
+    public static String getCoinSuffix() {
+        return " " + AbstractFacade.getCurrentTennantConnection().find(Negocio.class, 1).getMonedaPrincipal();
+
+    }
+
+    public static int getCoinChange() {
+        return AbstractFacade.getCurrentTennantConnection().find(Configuracion.class, R.SettingID.GENERAL_CAMBIO_MONEDA.getValue()).getValor();
+
+    }
+    
+    public static String getMainCoin(){
+        return AbstractFacade.getCurrentTennantConnection().find(Negocio.class, 1).getMonedaPrincipal();
+    }
 
     public static final String SEPARADOR = "_";
 
     public static boolean AUTO_UPDATE_INSUMO_PRICE = true;
 
-    public static String REST_NAME = em1.find(Negocio.class, 1).getNombre();
-
     public static String logFilePath = "logs/";
 
-    public static String COIN_SUFFIX = " " + em1.find(Negocio.class, 1).getMonedaPrincipal();
-
     public static final Date TODAYS_DATE = new Date();
-
-    public static int COINCHANGE = R.em1.find(Configuracion.class, R.SettingID.GENERAL_CAMBIO_MONEDA.getValue()).getValor();
-
-    public static String MAIN_COIN = em1.find(Negocio.class, 1).getMonedaPrincipal();
 
     public static final String NO_MESA = "M-0";
 
@@ -55,8 +67,8 @@ public class R {
 
     public static DecimalFormat formatoMoneda = new DecimalFormat("0.00");
 
-    public static final int MAJOR_VERSION = 6;
-    
+    public static final int MAJOR_VERSION = 5;
+
     public static final int MINOR_VERSION = 0;
 
     public static final int PATCH_VERSION = 0;

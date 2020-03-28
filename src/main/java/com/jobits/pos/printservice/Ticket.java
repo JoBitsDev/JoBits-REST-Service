@@ -6,6 +6,7 @@
 package com.jobits.pos.printservice;
 
 import com.jobits.pos.persistence.Configuracion;
+import com.jobits.pos.service.AbstractFacade;
 import com.jobits.utils.R;
 
 public class Ticket {
@@ -15,8 +16,8 @@ public class Ticket {
     /**
      * the paper lenght is 32 for 58mm and 48 for 80mm
      */
-    final static int PAPER_LENGHT = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_TICKET_TAMANO_PAPEL.getValue()).getValor();
-    final static char LINE_CHAR = R.em1.find(Configuracion.class, R.SettingID.IMPRESION_TICKET_CARACTER_SEPARADOR.getValue()).getValorString().charAt(0);
+    final static int PAPER_LENGHT = AbstractFacade.getCurrentTennantConnection().find(Configuracion.class, R.SettingID.IMPRESION_TICKET_TAMANO_PAPEL.getValue()).getValor();
+    final static char LINE_CHAR = AbstractFacade.getCurrentTennantConnection().find(Configuracion.class, R.SettingID.IMPRESION_TICKET_CARACTER_SEPARADOR.getValue()).getValorString().charAt(0);
     private AlignmentState posState = AlignmentState.LEFT;
 
     public Ticket() {

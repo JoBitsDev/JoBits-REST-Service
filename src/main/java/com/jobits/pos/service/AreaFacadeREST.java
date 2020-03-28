@@ -44,7 +44,7 @@ public class AreaFacadeREST extends AbstractFacade<Area> {
     @Path("FIND-VACIAS")
     public Response findEmptyTables(@QueryParam("codMesa") String codMesa) {
         List<String> ret = new ArrayList<>();
-        Mesa mesa = em1.find(Mesa.class, codMesa);
+        Mesa mesa = getEntityManager().find(Mesa.class, codMesa);
         Area a = mesa.getAreacodArea();
         ArrayList<Mesa> mesas = new ArrayList<>(a.getMesaList());
         Collections.sort(mesas);
@@ -54,7 +54,7 @@ public class AreaFacadeREST extends AbstractFacade<Area> {
                 ret.add(m.getCodMesa());
             }
         }
-        Collections.sort(ret, (String o1, String o2) -> o1.split(" ")[1].compareTo(o2.split(" ")[1]));
+        Collections.sort(ret, (String o1, String o2) -> o1.split("-")[1].compareTo(o2.split("-")[1]));
         return toJsonString(Response.Status.OK, ret);
     }
 
@@ -90,11 +90,6 @@ public class AreaFacadeREST extends AbstractFacade<Area> {
             ret.add(a.getCodArea());
         }
         return toJsonString(Response.Status.OK, ret);
-    }
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
     }
 
 }

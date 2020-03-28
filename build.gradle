@@ -72,6 +72,7 @@ cargo{
     local{
         homeDir = file(project.properties['server_location'])
         outputFile = file(project.properties['logs_location'])
+        jvmArgs = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
         startStopTimeout = 60000
 
         containerProperties {
@@ -84,7 +85,3 @@ cargo{
         username = 'tomcatadmin'
         password = 'Tomcat.Jobits@007'
     }}
-
-
-
-

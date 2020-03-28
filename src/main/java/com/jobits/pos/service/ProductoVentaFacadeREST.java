@@ -44,7 +44,7 @@ public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
     @GET
     @Path("PRODUCTS")
     public Response getProductsFromArea(@QueryParam("codArea") String id) {
-        Area a = em1.find(Area.class, id);
+        Area a = getEntityManager().find(Area.class, id);
         List<ProductoVenta> ret = new ArrayList<>();
         for (Carta carta : new ArrayList<>(a.getCartaList())) {
             for (Seccion seccion : new ArrayList<>(carta.getSeccionList())) {
@@ -66,10 +66,5 @@ public class ProductoVentaFacadeREST extends AbstractFacade<ProductoVenta> {
     public Response getRestantesDeProducto(@QueryParam("codProducto") String codProducto) {
         return toJsonString(Response.Status.OK, new IPVController(getEntityManager()).getRestantes(codProducto,findVenta().getFecha()));
     }
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em1;
-    }
-
+  
 }

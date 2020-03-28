@@ -58,13 +58,13 @@ import javax.ws.rs.core.Response;
 @Path("almacen/")
 public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
-    private EntityManager em = e.createEntityManager();
+    private EntityManager em;
 
     private final String PTO_ELAB = "ptoElab";
 
     public AlmacenFacadeREST() {
         super(Almacen.class);
-
+        em = super.getEntityManager();
     }
 
     @RolesAllowed("2")
@@ -158,8 +158,8 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             return toJsonString(Response.Status.BAD_REQUEST, "La cantidad de entrada no puede ser menor que 0");
         }
         float valor = Float.parseFloat(values.get("monto").toString());
-        TransaccionController controller = new TransaccionController(em1);
-        TransaccionEntrada entrada = controller.addTransaccionEntrada(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor);
+        TransaccionController controller = new TransaccionController(super.getEntityManager());
+        TransaccionEntrada entrada = controller.addTransaccionEntrada(null, super.getEntityManager().find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(), super.find(almacenCod), cant, valor);
 
         return toJsonString(Response.Status.OK, entrada.getTransaccion()); //TODO cambiar a 200
     }
@@ -199,8 +199,8 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                 return toJsonString(Response.Status.BAD_REQUEST, "La cantidad a dar salida no puede ser menor que 0");
             }
             String destino = (String) params.get("destino");
-            TransaccionSalida salida = new TransaccionController(em1).addTransaccionSalida(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
-                    super.find(almacenCod), em1.find(Cocina.class, destino), cant);
+            TransaccionSalida salida = new TransaccionController(super.getEntityManager()).addTransaccionSalida(null, super.getEntityManager().find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
+                    super.find(almacenCod), super.getEntityManager().find(Cocina.class, destino), cant);
             return toJsonString(Response.Status.OK, salida.getTransaccion());
         } catch (JsonProcessingException | NumberFormatException | BadRequestException ex) {
             return handleException(ex);
@@ -216,7 +216,8 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             @PathParam("insumoCod") String insumoCod,
             @PathParam("cant") float cant,
             @PathParam("razon") String razon) {
-        return new TransaccionController(em1).addTransaccionRebaja(null, em1.find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
+        return new TransaccionController(super.getEntityManager()).addTransaccionRebaja(null,
+                super.getEntityManager().find(Insumo.class, insumoCod), findVenta().getFecha(), new Date(),
                 super.find(almacenCod), cant, razon).toString();
 
     }
@@ -235,12 +236,12 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                 throw new BadRequestException("La lista de salidas debe ser 1");
             }
 
-            InsumoAlmacen salida = em1.find(InsumoAlmacen.class, model.getSalidas().get(0).getInsumoAlmacenPK());
-            em1.refresh(salida);
+            InsumoAlmacen salida = super.getEntityManager().find(InsumoAlmacen.class, model.getSalidas().get(0).getInsumoAlmacenPK());
+            super.getEntityManager().refresh(salida);
             boolean derivanteValido = false;
             for (InsumoAlmacen ia : model.getEntradas()) {
                 derivanteValido = false;
-                for (InsumoElaborado derivante : em1.find(Insumo.class, ia.getInsumo().getCodInsumo()).getProductosDerivantes()) {
+                for (InsumoElaborado derivante : super.getEntityManager().find(Insumo.class, ia.getInsumo().getCodInsumo()).getProductosDerivantes()) {
                     if (derivante.getDerivante().equals(salida.getInsumo())) {
                         derivanteValido = true;
                     }
@@ -253,10 +254,10 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             for (InsumoAlmacen entrada : model.getEntradas()) {
                 aux.add(transformInsumoAlmacen(entrada, 0));
             }
-            getEntityManager().getTransaction().begin();
-            new AlmacenController(getEntityManager(), findAll().get(0)).crearTransformacion(salida, model.getSalidas().get(0).getCantidad(), aux, findAll().get(0));
-            if (getEntityManager().getTransaction().isActive()) {
-                getEntityManager().getTransaction().commit();
+            getEntityManagerCon().getTransaction().begin();
+            new AlmacenController(getEntityManagerCon(), findAll().get(0)).crearTransformacion(salida, model.getSalidas().get(0).getCantidad(), aux, findAll().get(0));
+            if (getEntityManagerCon().getTransaction().isActive()) {
+                getEntityManagerCon().getTransaction().commit();
             }
 
             return toJsonString(Response.Status.OK, "Accion realizada exitosamente");
@@ -272,8 +273,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     @GET
     @Path("IPVS-DE-INSUMO")
     public Response getIPVS(@QueryParam("insumoCod") String codInsumo) {
-        em1 = e.createEntityManager();
-        ArrayList<Ipv> ipvs = new ArrayList<>(em1.createNamedQuery("Ipv.findByInsumocodInsumo")
+        ArrayList<Ipv> ipvs = new ArrayList<>(super.getEntityManager().createNamedQuery("Ipv.findByInsumocodInsumo")
                 .setParameter("insumocodInsumo", codInsumo)
                 .getResultList());
         List<String> cocinas = new ArrayList<>();
@@ -289,7 +289,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     @Path("REGISTRO-IPVS")
     public Response getRegistroIpvs(@QueryParam(PTO_ELAB) String puntoElaboracion) {
         ArrayList<IpvRegistro> aux = new ArrayList<>(
-                em1.createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFecha")
+                super.getEntityManager().createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFecha")
                         .setParameter("ipvcocinacodCocina", puntoElaboracion)
                         .setParameter("fecha", findVenta().getFecha())
                         .getResultList());
@@ -311,7 +311,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     @Path("REGISTRO-EXISTENCIAS")
     public Response getRegistroExistencias(@QueryParam(PTO_ELAB) String puntoElaboracion) {
         ArrayList<IpvVentaRegistro> aux = new ArrayList<>(
-                em1.createNamedQuery("IpvVentaRegistro.findByPtoElab")
+                super.getEntityManager().createNamedQuery("IpvVentaRegistro.findByPtoElab")
                         .setParameter("ptoElab", puntoElaboracion)
                         .setParameter("fecha", findVenta().getFecha())
                         .getResultList());
@@ -348,7 +348,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             ));
 
             for (InsumoAlmacen i : lista) {
-                for (InsumoElaborado ie : getEntityManager().find(Insumo.class,
+                for (InsumoElaborado ie : getEntityManagerCon().find(Insumo.class,
                         i.getInsumo().getCodInsumo()).getProductosDerivados()) {
                     admitidos.add(ie.getInsumo());
                 }
@@ -379,7 +379,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         });
         for (Transaccion t : ret) {
             if (t.getTransaccionEntrada() != null) {
-                t.setDescripcion("ENTRADA: " + t.getTransaccionEntrada().getValorTotal() + R.COIN_SUFFIX);
+                t.setDescripcion("ENTRADA: " + t.getTransaccionEntrada().getValorTotal() + R.getCoinSuffix());
             }
             if (t.getTransaccionMerma() != null) {
                 t.setDescripcion(t.getTransaccionMerma().getRazon().toUpperCase());
@@ -423,8 +423,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         return nueva;
     }
 
-    @Override
-    protected EntityManager getEntityManager() {
+    private EntityManager getEntityManagerCon() {
         return em;
     }
 
