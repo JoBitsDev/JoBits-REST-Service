@@ -8,11 +8,13 @@ package com.jobits.pos.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.jobits.pos.authentication.AuthenticationFilter;
 import com.jobits.pos.persistence.Orden;
 import com.jobits.pos.persistence.Personal;
 import com.jobits.pos.persistence.Venta;
 import com.jobits.pos.authentication.Credentials;
 import com.jobits.pos.authentication.Secured;
+import com.jobits.pos.authentication.TennantWrapper;
 import com.jobits.pos.persistence.pasarela.Cuenta;
 import com.jobits.pos.persistence.pasarela.Token;
 import com.jobits.pos.persistence.repository.DatabaseRepository;
@@ -41,8 +43,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.glassfish.jersey.server.ContainerRequest;
 
 /**
  * FirstDream
@@ -67,7 +72,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     public Response findActiveUsers() {
         ArrayList<String> aux = new ArrayList<>();
 
-        for (Orden x : super.em1.find(Venta.class, findVenta().getFecha()).getOrdenList()) {
+        for (Orden x : super.getEntityManager().find(Venta.class, findVenta().getFecha()).getOrdenList()) {
             String nombre = x.getPersonalusuario().getUsuario();
             if (!aux.contains(nombre)) {
                 aux.add(nombre);
@@ -80,16 +85,18 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     @POST
     @Path("AUTH")
     @Consumes(MediaType.TEXT_PLAIN)
-    public Response authenticateUser(String input) {
-
+    public Response authenticateUser(@Context ContainerRequestContext request, String input) {
+      
         try {
-
             ObjectMapper mapper = new JsonMapper();
             Credentials credentials = mapper.readValue(input, Credentials.class);
 
             String username = credentials.getUsername();
             String password = credentials.getPassword();
 
+            //set the correct tennant
+           new AuthenticationFilter().filterTennantToken(request);
+            
             // Authenticate the user using the credentials provided
             Personal p = authenticate(username, password);
             credentials.setAccessLevel(p.getPuestoTrabajonombrePuesto().getNivelAcceso());
@@ -110,7 +117,7 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
     }
 
     @POST
-    @Path("GET-TENNANT")
+    @Path("GET-TENNANT-TOKEN")
     @Consumes(MediaType.TEXT_PLAIN)
     public Response getTenant(String credential) {
         try {
@@ -121,9 +128,11 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
             String username = credentials.getUsername();
             String password = credentials.getPassword();
 
+            AbstractFacade.setCurrentTennant(DatabaseRepository.getDefaultFactory());
+            
             // Authenticate the user using the credentials provided
             Cuenta c = authenticateTennant(username, password);
-
+            
             // Issue a token for the user
             String token = issueTennantToken(c);
 
@@ -137,11 +146,6 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         } catch (InternalServerErrorException ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         }
-    }
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
     }
 
     private Personal authenticate(String username, String password) throws CredentialException, InternalServerErrorException {
@@ -180,12 +184,8 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         List<Cuenta> list = super.findAll(Cuenta.class);
         for (Cuenta x : list) {
             if (x.getUsuario().equals(username)) {
-                if (utils.getSHA256(x.getContrasena()).equals(password)) {
-                    if (!x.getActiva()) {
-                        return x;
-                    } else {
-                        throw new CredentialExpiredException("Usuario en linea");
-                    }
+                if (x.getContrasena().equals(password)) {
+                    return x;
                 }
                 throw new CredentialException("Credenciales de base de datos incorrectas");
             }
@@ -198,17 +198,24 @@ public class PersonalFacadeREST extends AbstractFacade<Personal> {
         // The issued token must be associated to a user
         // Return the issued token
         String token = generateToken();
-        List<Token> pasarela_tokens = findAll(Token.class);
+        EntityManager entity = DatabaseRepository.getDefaultConnection();
+        List<Token> pasarela_tokens = findAll(entity,Token.class);
         for (Token t : pasarela_tokens) {
             if (t.getCuenta().equals(c)) {
+                TennantWrapper wrapper = new TennantWrapper(t, DatabaseRepository.getFactoryFrom(c));
+                tennantTokens.put(t.getToken(), wrapper);
                 return t.getToken();
             }
         }
         Token newToken = new Token();
+        newToken.setCuentaid(c.getId());
         newToken.setCuenta(c);
         newToken.setToken(token);
-        getEntityManager().persist(newToken);
-        tennantTokens.put(token, newToken);
+        entity.getTransaction().begin();
+        entity.persist(newToken);
+        entity.getTransaction().commit();
+        TennantWrapper wrapper = new TennantWrapper(newToken, DatabaseRepository.getFactoryFrom(c));
+        tennantTokens.put(token, wrapper);
         return token;
     }
 

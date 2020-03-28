@@ -8,6 +8,7 @@ package com.jobits.pos.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.Credentials;
+import com.jobits.pos.authentication.TennantWrapper;
 import com.jobits.pos.persistence.Venta;
 import com.jobits.pos.persistence.pasarela.Token;
 import com.jobits.pos.persistence.repository.DatabaseRepository;
@@ -28,7 +29,7 @@ import javax.xml.ws.WebServiceContext;
  *
  * @author Jorge
  */
-public abstract class AbstractFacade<T> {
+public class AbstractFacade<T> {
 
     @Resource
     WebServiceContext webServiceContext;
@@ -36,17 +37,23 @@ public abstract class AbstractFacade<T> {
     private Class<T> entityClass;
 
     public static HashMap<String, Credentials> tokens = new HashMap<>();
-    public static HashMap<String, Token> tennantTokens = new HashMap<>();
-    
-    public static EntityManagerFactory currentTennant = DatabaseRepository.getDefaultFactory();
-    protected EntityManagerFactory e = currentTennant;
-    protected EntityManager em1 = e.createEntityManager();
+    public static HashMap<String, TennantWrapper> tennantTokens = new HashMap<>();
+
+    private static EntityManagerFactory e;
+    private static EntityManager em1;
 
     public AbstractFacade(Class<T> entityClass) {
         this.entityClass = entityClass;
+        if (e == null) {
+            e = DatabaseRepository.getDefaultFactory();
+            em1 = e.createEntityManager();
+        }
     }
 
-    protected abstract EntityManager getEntityManager();
+    public static void setCurrentTennant(EntityManagerFactory emfTennant) {
+        e = emfTennant;
+        em1 = e.createEntityManager();
+    }
 
     public void create(T entity) {
         if (em1.getTransaction().isActive()) {
@@ -164,6 +171,10 @@ public abstract class AbstractFacade<T> {
         return requestContext.getHeader(HttpHeaders.AUTHORIZATION).substring("Bearer".length()).trim();
     }
 
+      protected String getTennantToken(HttpServletRequest requestContext) {
+        return requestContext.getHeader(HttpHeaders.LOCATION).substring("TennantId".length()).trim();
+    }
+    
     protected void startTransaction() {
         if (!getEntityManager().getTransaction().isActive()) {
             getEntityManager().getTransaction().begin();
@@ -175,4 +186,13 @@ public abstract class AbstractFacade<T> {
             getEntityManager().getTransaction().commit();
         }
     }
+
+    protected EntityManager getEntityManager() {
+        return em1;
+    }
+    
+    public static EntityManager getCurrentTennantConnection(){
+        return em1;
+    }
+
 }
