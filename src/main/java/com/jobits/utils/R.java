@@ -75,7 +75,7 @@ public class R {
 
     public static String RELEASE_VERSION = "Version " + MAJOR_VERSION + "." + MINOR_VERSION + "." + PATCH_VERSION;
 
-    public static int BUILD_VERSION = 17;
+    public static int BUILD_VERSION = 18;
 
     public static enum SettingID {
 
