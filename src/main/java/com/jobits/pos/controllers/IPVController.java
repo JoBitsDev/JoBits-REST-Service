@@ -42,7 +42,7 @@ public class IPVController extends AbstractController {
         return cantidadMinima == Integer.MAX_VALUE ? 0 : cantidadMinima;
     }
 
-    public void consumir(ProductovOrden productoVenta, float cantidad) throws PersistenceException{
+    public void consumir(ProductovOrden productoVenta, float cantidad) throws PersistenceException {
         List<IpvRegistro> updateList = new ArrayList<>();
         for (ProductoInsumo productoInsumo : productoVenta.getProductoVenta().getProductoInsumoList()) {
             IpvRegistro registro
@@ -202,12 +202,16 @@ public class IPVController extends AbstractController {
     }
 
     public IpvRegistro getIpvRegistro(Cocina c, Date fecha, Insumo i) throws NoResultException, PersistenceException {
-        return (IpvRegistro) getEntityManager().createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo")
-                .setParameter("ipvcocinacodCocina", c.getCodCocina())
-                .setParameter("fecha", fecha)
-                .setParameter("codinsumo", i.getCodInsumo())
-                .getSingleResult();
+        try {
+            return (IpvRegistro) getEntityManager().createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo")
+                    .setParameter("ipvcocinacodCocina", c.getCodCocina())
+                    .setParameter("fecha", fecha)
+                    .setParameter("codinsumo", i.getCodInsumo())
+                    .getSingleResult();
 
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public boolean hayDisponibilidad(ProductoVenta selected, Date fecha, float cantidad) {
