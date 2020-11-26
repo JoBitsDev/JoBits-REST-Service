@@ -19,23 +19,13 @@ import com.jobits.pos.persistence.models.VentaResumenModel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.ws.handler.MessageContext;
 import com.jobits.utils.R;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.QueryParam;
 
 /**
@@ -77,13 +67,18 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
         try {
             v = find(R.DATE_FORMAT.parse(fecha));
             if (v == null) {
-                return Response.status(Response.Status.NOT_FOUND).entity("No existe una venta registrada en la fecha seleccionada").build();
+                return Response.status(Response.Status.NOT_FOUND).
+                        entity("No existe una venta registrada en la fecha seleccionada").build();
             }
-            return Response.ok(new ObjectMapper().writeValueAsString(VentaResumenController.createResumenFromVenta(v))).build();
+            return Response.ok(new ObjectMapper().
+                    writeValueAsString(VentaResumenController.
+                            createResumenFromVenta(v))).build();
         } catch (ParseException ex) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Formato de entrada incorrecto").build();
+            return Response.status(Response.Status.BAD_REQUEST).
+                    entity("Formato de entrada incorrecto").build();
         } catch (JsonProcessingException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte").build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                    entity("Error en el Object Mapper. Contacte con soporte").build();
         }
 
     }
@@ -95,7 +90,10 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     public Response getResumenPorArea(@QueryParam("fecha") String fecha, @QueryParam("areaCod") String area) {
         try {
             return toJsonString(Response.Status.OK,
-                    DetallesVentasModel.createDetallesVentaFromEntity(VentaCalculator.getResumenVentaPorArea(find(R.DATE_FORMAT.parse(fecha)), em1.find(Area.class, area))));
+                    DetallesVentasModel.createDetallesVentaFromEntity(
+                            VentaCalculator.getResumenVentaPorArea(
+                                    find(R.DATE_FORMAT.parse(fecha)),
+                                    getEntityManager().find(Area.class, area))));
         } catch (ParseException ex) {
             return handleException(ex);
         }
@@ -108,7 +106,11 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     public Response getResumenPorDependiente(@QueryParam("fecha") String fecha, @QueryParam("usuario") String usuario) {
         try {
             return toJsonString(Response.Status.OK,
-                    DetallesVentasModel.createDetallesVentaFromEntity(VentaCalculator.getResumenVentasCamarero(find(R.DATE_FORMAT.parse(fecha)), em1.find(Personal.class, usuario))));
+                    DetallesVentasModel.createDetallesVentaFromEntity(
+                            VentaCalculator.getResumenVentasCamarero(
+                                    find(R.DATE_FORMAT.parse(fecha)),
+                                    getEntityManager().find(Personal.class,
+                                            usuario))));
         } catch (ParseException ex) {
             return handleException(ex);
         }
@@ -118,10 +120,16 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     @GET
     @Path("DETALLES-POR-COCINA")
     @Secured
-    public Response getResumenPorCocina(@QueryParam("fecha") String fecha, @QueryParam("cocinaCod") String cocinaCod) {
+    public Response getResumenPorCocina(
+            @QueryParam("fecha") String fecha,
+            @QueryParam("cocinaCod") String cocinaCod) {
         try {
             return toJsonString(Response.Status.OK,
-                    DetallesVentasModel.createDetallesVentaFromEntity(VentaCalculator.getResumenVentasCocina(find(R.DATE_FORMAT.parse(fecha)), em1.find(Cocina.class, cocinaCod))));
+                    DetallesVentasModel.createDetallesVentaFromEntity(
+                            VentaCalculator.getResumenVentasCocina(
+                                    find(R.DATE_FORMAT.parse(fecha)),
+                                    getEntityManager().find(Cocina.class,
+                                            cocinaCod))));
         } catch (ParseException ex) {
             return handleException(ex);
         }
@@ -134,15 +142,11 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
     public Response getResumenPorDependiente(@QueryParam("fecha") String fecha) {
         try {
             return toJsonString(Response.Status.OK,
-                    DetallesVentasModel.createDetallesVentaFromEntity(VentaCalculator.getResumenVentas(find(R.DATE_FORMAT.parse(fecha)))));
+                    DetallesVentasModel.createDetallesVentaFromEntity(
+                            VentaCalculator.getResumenVentas(
+                                    find(R.DATE_FORMAT.parse(fecha)))));
         } catch (ParseException ex) {
             return handleException(ex);
         }
     }
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
-    }
-
 }

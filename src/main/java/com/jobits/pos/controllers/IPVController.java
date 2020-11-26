@@ -176,12 +176,16 @@ public class IPVController extends AbstractController {
     }
 
     public IpvRegistro getIpvRegistro(Cocina c, Date fecha, Insumo i) throws NoResultException, PersistenceException {
-        return (IpvRegistro) getEntityManager().createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo")
-                .setParameter("ipvcocinacodCocina", c.getCodCocina())
-                .setParameter("fecha", fecha)
-                .setParameter("codinsumo", i.getCodInsumo())
-                .getSingleResult();
+        try {
+            return (IpvRegistro) getEntityManager().createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo")
+                    .setParameter("ipvcocinacodCocina", c.getCodCocina())
+                    .setParameter("fecha", fecha)
+                    .setParameter("codinsumo", i.getCodInsumo())
+                    .getSingleResult();
 
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public boolean hayDisponibilidad(ProductoVenta selected, Date fecha, float cantidad) {

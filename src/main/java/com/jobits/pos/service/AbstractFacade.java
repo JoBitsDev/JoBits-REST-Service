@@ -7,7 +7,11 @@ package com.jobits.pos.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jobits.pos.authentication.Credentials;
+import com.jobits.pos.authentication.TennantWrapper;
 import com.jobits.pos.persistence.Venta;
+import com.jobits.pos.persistence.pasarela.Token;
+import com.jobits.pos.persistence.repository.DatabaseRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,21 +29,31 @@ import javax.xml.ws.WebServiceContext;
  *
  * @author Jorge
  */
-public abstract class AbstractFacade<T> {
+public class AbstractFacade<T> {
 
     @Resource
     WebServiceContext webServiceContext;
 
     private Class<T> entityClass;
 
-    protected EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
-    protected EntityManager em1 = e.createEntityManager();
+    public static HashMap<String, Credentials> tokens = new HashMap<>();
+    public static HashMap<String, TennantWrapper> tennantTokens = new HashMap<>();
+
+    private static EntityManagerFactory e;
+    private static EntityManager em1;
 
     public AbstractFacade(Class<T> entityClass) {
         this.entityClass = entityClass;
+        if (e == null) {
+            e = DatabaseRepository.getDefaultFactory();
+            em1 = e.createEntityManager();
+        }
     }
 
-    protected abstract EntityManager getEntityManager();
+    public static void setCurrentTennant(EntityManagerFactory emfTennant) {
+        e = emfTennant;
+        em1 = e.createEntityManager();
+    }
 
     public void create(T entity) {
         if (em1.getTransaction().isActive()) {
@@ -100,6 +114,12 @@ public abstract class AbstractFacade<T> {
 
     }
 
+    public static List findAll(EntityManager em, Class entity) {
+        javax.persistence.criteria.CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+        cq.select(cq.from(entity));
+        return em.createQuery(cq).getResultList();
+    }
+
     public List<T> findRange(int[] range) {
         javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
@@ -133,7 +153,7 @@ public abstract class AbstractFacade<T> {
 
     protected Response handleException(Exception ex) {
         if (ex instanceof JsonProcessingException) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte" +((JsonProcessingException) ex).getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error en el Object Mapper. Contacte con soporte" + ((JsonProcessingException) ex).getMessage()).build();
         }
         System.out.println(ex.getStackTrace()[0]);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Contacte con soporte " + ex.getMessage()).build();
@@ -150,6 +170,10 @@ public abstract class AbstractFacade<T> {
     protected String getToken(HttpServletRequest requestContext) {
         return requestContext.getHeader(HttpHeaders.AUTHORIZATION).substring("Bearer".length()).trim();
     }
+
+      protected String getTennantToken(HttpServletRequest requestContext) {
+        return requestContext.getHeader(HttpHeaders.LOCATION).substring("TennantId".length()).trim();
+    }
     
     protected void startTransaction() {
         if (!getEntityManager().getTransaction().isActive()) {
@@ -162,4 +186,13 @@ public abstract class AbstractFacade<T> {
             getEntityManager().getTransaction().commit();
         }
     }
+
+    protected EntityManager getEntityManager() {
+        return em1;
+    }
+    
+    public static EntityManager getCurrentTennantConnection(){
+        return em1;
+    }
+
 }

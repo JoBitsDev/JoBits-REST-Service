@@ -65,6 +65,7 @@ public class ConfiguracionFacadeREST extends AbstractFacade<Configuracion> {
             con.setRequestMethod("GET");
             con.setRequestProperty("Content-Type", "text/plain");
             con.setRequestProperty("Authorization", "Bearer " + getToken(header));
+            con.setRequestProperty("Location", "TennantId " + getTennantToken(header));
 
             if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {//si esta ok lee el JSON
                 BufferedReader input = new BufferedReader(
