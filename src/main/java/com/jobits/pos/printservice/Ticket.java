@@ -227,7 +227,7 @@ public class Ticket {
     }
 
     public String soundBuzzer() {
-        final byte[] buzzer = {27, (int) '(', (int) 'A', 4, 0, 48, 55, 3, 15};
+       final byte[] buzzer = {27,66,4,3};
         String s = new String(buzzer);
         commandSet += s;
         return s;
