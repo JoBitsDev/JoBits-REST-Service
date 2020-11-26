@@ -54,7 +54,7 @@ public class AreaFacadeREST extends AbstractFacade<Area> {
                 ret.add(m.getCodMesa());
             }
         }
-        Collections.sort(ret, (String o1, String o2) -> o1.split(" ")[1].compareTo(o2.split(" ")[1]));
+        Collections.sort(ret, (String o1, String o2) -> o1.split("-")[1].compareTo(o2.split("-")[1]));
         return toJsonString(Response.Status.OK, ret);
     }
 
