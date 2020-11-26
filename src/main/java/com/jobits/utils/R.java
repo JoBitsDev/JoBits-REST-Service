@@ -59,11 +59,11 @@ public class R {
     
     public static final int MINOR_VERSION = 0;
 
-    public static final int PATCH_VERSION = 0;
+    public static final int PATCH_VERSION = 1;
 
     public static String RELEASE_VERSION = "Version " + MAJOR_VERSION + "." + MINOR_VERSION + "." + PATCH_VERSION;
 
-    public static int BUILD_VERSION = 17;
+    public static int BUILD_VERSION = 18;
 
     public static enum SettingID {
 
