@@ -506,6 +506,7 @@ public class Impresion {
                 // RAM.add(new CopiaTicket(c.getNombreCocina(), t.finalCommandSet().getBytes()));
             }
             if (c.getRecibirNotificacion()) {
+                forceBell(c.getNombreCocina());
                 feedPrinter(t.finalCommandSet().getBytes(), c.getNombreCocina());
             }
         } else {
@@ -800,12 +801,11 @@ public class Impresion {
 
     }
 
-    public void forceBell() {
+    public void forceBell(String printLocation) {
         Ticket t = new Ticket();
         t.resetAll();
-        t.initialize();
         t.soundBuzzer();
-        sendToPrinter(t.finalCommandSet().getBytes(), DEFAULT_PRINT_LOCATION);
+        sendToPrinter(t.finalCommandSet().getBytes(), printLocation);
 
     }
 
