@@ -72,7 +72,7 @@ public class VentaFacadeREST extends AbstractFacade<Venta> {
             }
             return Response.ok(new ObjectMapper().
                     writeValueAsString(VentaResumenController.
-                            createResumenFromVenta(v))).build();
+                            createResumenFromVenta(getCurrentTennantConnection(),v))).build();
         } catch (ParseException ex) {
             return Response.status(Response.Status.BAD_REQUEST).
                     entity("Formato de entrada incorrecto").build();
