@@ -142,6 +142,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
     }
 
     @RolesAllowed("2")
+    @Secured
     @POST
     @Path("ENTRADA")
     public Response entrada(String hashMap) {
@@ -208,6 +209,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
     }
 
+    @Deprecated
     @RolesAllowed("4")
     @DELETE
     @Path("MERMAR_{almacenCod}_{insumoCod}_{cant}_{razon}")
