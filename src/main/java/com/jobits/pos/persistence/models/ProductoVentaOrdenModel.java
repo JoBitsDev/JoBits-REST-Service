@@ -20,17 +20,17 @@ import com.jobits.pos.persistence.ProductoVenta;
 public class ProductoVentaOrdenModel {
 
     private float enviadosACocina;
+    private ProductovOrdenPKModel productoVentaOrdenPK;
     private float cantidad;
     private Orden orden;
     private ProductoVenta productoVenta;
     private int numeroComensal;
     private Mesa mesa;
     private String nota;
-    private int productoVentaOrdenId;
-    
-    public ProductoVentaOrdenModel(float enviadosACocina, int productoVentaOrdenId, float cantidad, Orden orden, ProductoVenta productoVenta, int numeroComensal, Mesa mesa, String nota) {
+
+    public ProductoVentaOrdenModel(float enviadosACocina, ProductovOrdenPKModel productoVentaOrdenPK, float cantidad, Orden orden, ProductoVenta productoVenta, int numeroComensal, Mesa mesa, String nota) {
         this.enviadosACocina = enviadosACocina;
-        this.productoVentaOrdenId = productoVentaOrdenId;
+        this.productoVentaOrdenPK = productoVentaOrdenPK;
         this.cantidad = cantidad;
         this.orden = orden;
         this.productoVenta = productoVenta;
@@ -47,12 +47,12 @@ public class ProductoVentaOrdenModel {
         this.enviadosACocina = enviadosACocina;
     }
 
-    public int getProductoVentaOrdenId() {
-        return productoVentaOrdenId;
+    public ProductovOrdenPKModel getProductoVentaOrdenPK() {
+        return productoVentaOrdenPK;
     }
 
-    public void setProductoVentaOrdenId(int productoVentaOrdenId) {
-        this.productoVentaOrdenId = productoVentaOrdenId;
+    public void setProductoVentaOrdenPK(ProductovOrdenPKModel productoVentaOrdenPK) {
+        this.productoVentaOrdenPK = productoVentaOrdenPK;
     }
 
     public float getCantidad() {

@@ -243,8 +243,8 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             boolean derivanteValido = false;
             for (InsumoAlmacen ia : model.getEntradas()) {
                 derivanteValido = false;
-                for (InsumoElaborado derivante : super.getEntityManager().find(Insumo.class, ia.getInsumo().getCodInsumo()).getProductosDerivantes()) {
-                    if (derivante.getDerivante().equals(salida.getInsumo())) {
+                for (InsumoElaborado derivante : super.getEntityManager().find(Insumo.class, ia.getInsumo().getCodInsumo()).getInsumoDerivadoList()) {
+                    if (derivante.getInsumo_derivado_nombre().equals(salida.getInsumo())) {
                         derivanteValido = true;
                     }
                 }
@@ -303,7 +303,12 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
             }
         }
 
-        Collections.sort(ret);
+         Collections.sort(ret,new Comparator<IpvRegistro>() {
+            @Override
+            public int compare(IpvRegistro o1, IpvRegistro o2) {
+                return o1.getIpv().getInsumo().getNombre().compareTo(o2.getIpv().getInsumo().getNombre());
+            }
+        });
         return toJsonString(Response.Status.OK, ret);
     }
 
@@ -324,7 +329,12 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
                 ret.add(transform(x));
             }
         }
-        Collections.sort(ret);
+        Collections.sort(ret,new Comparator<IpvRegistro>() {
+            @Override
+            public int compare(IpvRegistro o1, IpvRegistro o2) {
+                return o1.getIpv().getInsumo().getNombre().compareTo(o2.getIpv().getInsumo().getNombre());
+            }
+        });
         return toJsonString(Response.Status.OK, ret);
     }
 
@@ -351,7 +361,7 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
 
             for (InsumoAlmacen i : lista) {
                 for (InsumoElaborado ie : getEntityManagerCon().find(Insumo.class,
-                        i.getInsumo().getCodInsumo()).getProductosDerivados()) {
+                        i.getInsumo().getCodInsumo()).getInsumoDerivadoList()) {
                     admitidos.add(ie.getInsumo());
                 }
             }
@@ -405,12 +415,12 @@ public class AlmacenFacadeREST extends AbstractFacade<Almacen> {
         IpvRegistroPK pk = new IpvRegistroPK(
                 registro.getProductoVenta().getNombre(),
                 registro.getProductoVenta().getCocinacodCocina().getCodCocina(),
-                registro.getIpvVentaRegistroPK().getVentafecha());
+                registro.getDiaVenta().getFecha());
         IpvRegistro ret = new IpvRegistro(pk);
-        ret.setConsumo(registro.getVenta() + registro.getAutorizos());
+        ret.setConsumo(registro.getVenta()+ registro.getAutorizos());
         ret.setDisponible(registro.getDisponible());
         ret.setEntrada(registro.getEntrada());
-        ret.setFinal1(registro.getFinal1());
+        ret.setFinalCalculado(registro.getFinal1());
         ret.setInicio(registro.getInicio());
         return ret;
     }

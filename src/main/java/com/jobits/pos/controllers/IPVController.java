@@ -5,8 +5,15 @@
  */
 package com.jobits.pos.controllers;
 
-import com.jobits.pos.persistence.*;
-import com.jobits.utils.utils;
+import com.jobits.pos.persistence.Insumo;
+import com.jobits.pos.persistence.ProductovOrden;
+import com.jobits.pos.persistence.Cocina;
+import com.jobits.pos.persistence.ProductoInsumo;
+import com.jobits.pos.persistence.IpvRegistroPK;
+import com.jobits.pos.persistence.IpvVentaRegistroPK;
+import com.jobits.pos.persistence.ProductoVenta;
+import com.jobits.pos.persistence.IpvRegistro;
+import com.jobits.pos.persistence.IpvVentaRegistro;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,73 +49,6 @@ public class IPVController extends AbstractController {
         return cantidadMinima == Integer.MAX_VALUE ? 0 : cantidadMinima;
     }
 
-    public void consumir(ProductovOrden productoVenta, float cantidad) throws PersistenceException {
-        consumirIpvRegistro(productoVenta, cantidad);
-        IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
-        IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
-        if (ipvVenta != null) {
-            ipvVenta.setVenta(ipvVenta.getVenta() + cantidad);
-            updateInstance(ipvVenta);
-        }
-    }
-
-    public void consumirPorLaCasa(ProductovOrden productoVenta, float cantidad) {
-        consumirIpvRegistro(productoVenta, cantidad);
-        IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
-        IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
-        if (ipvVenta != null) {
-            ipvVenta.setAutorizos(ipvVenta.getAutorizos() + cantidad);
-            updateInstance(ipvVenta);
-        }
-    }
-
-    //esto solo pincha cuando ponen el de la casa al final
-    public void consumirPorLaCasa(List<ProductovOrden> listaProductos) {
-        for (ProductovOrden x : listaProductos) {
-            IpvVentaRegistroPK pk = new IpvVentaRegistroPK(x.getOrden().getVentafecha().getFecha(), x.getProductoVenta().getPCod());
-            IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
-            if (ipvVenta != null) {
-                ipvVenta.setVenta(ipvVenta.getVenta() - x.getCantidad());
-                ipvVenta.setAutorizos(ipvVenta.getAutorizos() + x.getCantidad());
-                updateInstance(ipvVenta);
-            }
-        }
-
-    }
-
-    //esto solo pincha cuando ponen el de la casa al final
-    public void devolverPorLaCasa(List<ProductovOrden> listaProductos) {
-        for (ProductovOrden x : listaProductos) {
-            IpvVentaRegistroPK pk = new IpvVentaRegistroPK(x.getOrden().getVentafecha().getFecha(), x.getProductoVenta().getPCod());
-            IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
-            if (ipvVenta != null) {
-                ipvVenta.setAutorizos(ipvVenta.getAutorizos() - x.getCantidad());
-                ipvVenta.setVenta(ipvVenta.getVenta() + x.getCantidad());
-                updateInstance(ipvVenta);
-            }
-        }
-    }
-
-    public void devolverPorLaCasa(ProductovOrden productoVenta, float diferencia) {
-        devolverIpvRegistro(productoVenta, diferencia);
-        IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
-        IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
-        if (ipvVenta != null) {
-            ipvVenta.setAutorizos(ipvVenta.getAutorizos() - diferencia);
-            updateInstance(ipvVenta);
-        }
-    }
-
-    public void devolver(ProductovOrden productoVenta, float diferencia) {
-        devolverIpvRegistro(productoVenta, diferencia);
-        IpvVentaRegistroPK pk = new IpvVentaRegistroPK(productoVenta.getOrden().getVentafecha().getFecha(), productoVenta.getProductoVenta().getPCod());
-        IpvVentaRegistro ipvVenta = getEntityManager().find(IpvVentaRegistro.class, pk);
-        if (ipvVenta != null) {
-            ipvVenta.setVenta(ipvVenta.getVenta() - diferencia);
-            updateInstance(ipvVenta);
-        }
-    }
-
     public void updateInstance(IpvRegistro instance) {
         if (instance.getEntrada() == null) {
             instance.setEntrada((float) 0);
@@ -122,11 +62,11 @@ public class IPVController extends AbstractController {
         if (instance.getConsumoReal() == null) {
             instance.setConsumoReal((float) 0);
         }
-        if (instance.getFinal1() == null) {
-            instance.setFinal1((float) 0);
+        if (instance.getFinalCalculado() == null) {
+            instance.setFinalCalculado((float) 0);
         }
-        if (instance.getFinalReal() == null) {
-            instance.setFinalReal((float) 0);
+        if (instance.getFinalAjustado() == null) {
+            instance.setFinalAjustado((float) 0);
         }
         if (instance.getDisponible() == null) {
             instance.setDisponible((float) 0);
@@ -220,7 +160,7 @@ public class IPVController extends AbstractController {
         for (ProductoInsumo productoInsumo : productoVenta.getProductoVenta().getProductoInsumoList()) {
             IpvRegistro registro
                     = getIpvRegistro(productoVenta.getProductoVenta().getCocinacodCocina(),
-                            productoVenta.getOrden().getVentafecha().getFecha(),
+                            productoVenta.getOrden().getVentafecha(),
                             productoInsumo.getInsumo());
             if (registro != null) {
                 float cantidadaRebajar = productoInsumo.getCantidad() * cantidad;
@@ -238,7 +178,7 @@ public class IPVController extends AbstractController {
         for (ProductoInsumo productoInsumo : productoVenta.getProductoVenta().getProductoInsumoList()) {
             IpvRegistro registro
                     = getIpvRegistro(productoVenta.getProductoVenta().getCocinacodCocina(),
-                            productoVenta.getOrden().getVentafecha().getFecha(),
+                            productoVenta.getOrden().getVentafecha(),
                             productoInsumo.getInsumo());
             if (registro != null) {
                 float cantidadaRebajar = productoInsumo.getCantidad() * cantidad;

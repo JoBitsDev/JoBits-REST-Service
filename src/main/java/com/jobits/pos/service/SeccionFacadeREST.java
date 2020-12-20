@@ -10,6 +10,7 @@ import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.persistence.Seccion;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
@@ -46,7 +47,12 @@ public class SeccionFacadeREST extends AbstractFacade<Seccion> {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getAlll() {
         ArrayList <Seccion> ret = new ArrayList<>(super.findAll());
-        Collections.sort(ret);
+        Collections.sort(ret,new Comparator<Seccion>() {
+            @Override
+            public int compare(Seccion o1, Seccion o2) {
+                return o1.getNombreSeccion().compareTo(o2.getNombreSeccion());
+            }
+        });
         return toJsonString(Response.Status.OK, ret);
     }
 

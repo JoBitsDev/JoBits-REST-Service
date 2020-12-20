@@ -5,12 +5,22 @@
  */
 package com.jobits.pos.service;
 
+import com.jobits.pos.persistence.ProductoVenta;
+import com.jobits.pos.persistence.Nota;
+import com.jobits.pos.persistence.Personal;
+import com.jobits.pos.persistence.Venta;
+import com.jobits.pos.persistence.Mesa;
+import com.jobits.pos.persistence.Impresora;
+import com.jobits.pos.persistence.NotificacionEnvioCocinaPK;
+import com.jobits.pos.persistence.Configuracion;
+import com.jobits.pos.persistence.NotificacionEnvioCocina;
+import com.jobits.pos.persistence.ProductovOrden;
+import com.jobits.pos.persistence.Orden;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.AuthenticationFilter;
 import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.controllers.IPVController;
-import com.jobits.pos.persistence.*;
 import com.jobits.pos.notificationdelivery.Notificable;
 import com.jobits.pos.notificationdelivery.Notificador;
 import com.jobits.pos.printservice.Impresion;
@@ -18,7 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -80,7 +89,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         m.setEstado(o.getCodOrden() + " " + usuarioTrabajando);
         o.setMesacodMesa(m);
         o.setPersonalusuario(p);
-        o.setVentafecha(v);
+        o.setVentafecha(v.getFecha());
         o.setDeLaCasa(false);
         o.setHoraComenzada(new Date());
         o.setOrdenvalorMonetario(Float.valueOf("0"));
@@ -155,7 +164,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         }
         if (!po.isEmpty()) {
             for (int i = 0; contains == -1 && i < po.size(); i++) {
-                if (po.get(i).getProductoVenta().getPCod().equals(codProducto)) {
+                if (po.get(i).getProductoVenta().getCodigoProducto().equals(codProducto)) {
                     contains = i;
                 }
             }
@@ -167,7 +176,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             founded.setCantidad(cant + cantidad);
 
         } else {
-            founded = new ProductovOrden(codProducto, codOrden);
+            founded = new ProductovOrden();
             founded.setOrden(o);
             founded.setProductoVenta(producto);
             founded.setCantidad(cantidad);
@@ -180,13 +189,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         }
         o.setProductovOrdenList(po);
         o.setOrdenvalorMonetario(calcularValorTotal(o));
-        if (o.getDeLaCasa()) {
-            ipvController.consumirPorLaCasa(founded, cantidad);
-        } else {
-            ipvController.consumir(founded, cantidad);
-        }
         super.edit(o);
-        return toJsonString(Response.Status.OK, o);
+        return toJsonString(Response.Status.OK, founded);
     }//TODO: Respuesta del servidor incorrecta
 
     @RolesAllowed("0")
@@ -212,7 +216,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         int contains = -1;
 
         for (int i = 0; contains == -1 && i < po.size(); i++) {
-            if (po.get(i).getProductoVenta().getPCod().equals(codProducto)) {
+            if (po.get(i).getProductoVenta().getCodigoProducto().equals(codProducto)) {
                 contains = i;
             }
         }
@@ -229,18 +233,13 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                 i.printCancelationTicket(o);
                 po.remove(contains);
                 getEntityManager().getTransaction().begin();
-                p = getEntityManager().find(ProductovOrden.class, p.getProductovOrdenPK());
+                p = getEntityManager().find(ProductovOrden.class, p.getId());
                 getEntityManager().remove(p);
                 getEntityManager().getTransaction().commit();
 
             }
             o.setProductovOrdenList(po);
             o.setOrdenvalorMonetario(calcularValorTotal(o));
-            if (o.getDeLaCasa()) {
-                ipvController.devolverPorLaCasa(p, cantidad);
-            } else {
-                ipvController.devolver(p, cantidad);
-            }
             super.edit(o);
         }//TODO: aqui hay que disminuir tambien los contadores para enviado a cocina junto con los contadores de cantidad
 
@@ -305,8 +304,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                 if (x.getEnviadosacocina() < x.getCantidad()) {
                     NotificacionEnvioCocinaPK notPK = new NotificacionEnvioCocinaPK();
                     notPK.setCocinacodCocina(x.getProductoVenta().getCocinacodCocina().getCodCocina());
-                    notPK.setProductovOrdenordencodOrden(o.getCodOrden());
-                    notPK.setProductovOrdenproductoVentapCod(x.getProductoVenta().getPCod());
+                    notPK.setProductovOrdenId(x.getId());
                     NotificacionEnvioCocina not = super.getEntityManager().find(NotificacionEnvioCocina.class, notPK);
                     boolean exist = true;
                     if (not == null) {
@@ -316,7 +314,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
                     not.setCocina(x.getProductoVenta().getCocinacodCocina());
                     not.setHoraNotificacion(new Date());
                     not.setProductovOrden(x);
-                    not.setIpDependiente(inRequest.getRemoteHost());
+                    not.setIp_dependiente(inRequest.getRemoteHost());
                     super.getEntityManager().getTransaction().begin();
                     if (exist) {
                         not.setCantidad(not.getCantidad() + (x.getCantidad() - x.getEnviadosacocina()));
@@ -371,10 +369,9 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         nota = nota.replace('%', ' ');
 
         for (ProductovOrden x : o.getProductovOrdenList()) {
-            if (x.getProductoVenta().getPCod().equals(pCod)) {
+            if (x.getProductoVenta().getCodigoProducto().equals(pCod)) {
                 if (x.getNota() == null) {
-                    NotaPK notaPk = new NotaPK(pCod, codOrden);
-                    Nota newNota = new Nota(notaPk);
+                    Nota newNota = new Nota(x.getId());
                     newNota.setDescripcion(nota);
                     x.setNota(newNota);
                     pv = x;
@@ -401,7 +398,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     public Response getNota(@QueryParam("codOrden") String codOrden, @QueryParam("codProd") String pCod) {
         Orden o = super.find(codOrden);
         for (ProductovOrden x : o.getProductovOrdenList()) {
-            if (x.getProductoVenta().getPCod().equals(pCod)) {
+            if (x.getProductoVenta().getCodigoProducto().equals(pCod)) {
                 if (x.getNota() == null) {
                     return toJsonString(Response.Status.OK, "");
                 }
@@ -423,7 +420,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Orden o = super.find(codOrden);
 
         for (ProductovOrden x : o.getProductovOrdenList()) {
-            if (x.getProductoVenta().getPCod().equals(pCod)) {
+            if (x.getProductoVenta().getCodigoProducto().equals(pCod)) {
                 if (x.getNumeroComensal() == null) {
                     return toJsonString(Response.Status.OK, 0);
                 }
@@ -456,7 +453,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Orden o = super.find(codOrden);
         ProductovOrden pv = null;
         for (ProductovOrden x : o.getProductovOrdenList()) {
-            if (x.getProductoVenta().getPCod().equals(pCod)) {
+            if (x.getProductoVenta().getCodigoProducto().equals(pCod)) {
                 x.setNumeroComensal(numero);
                 pv = x;
             }
@@ -487,11 +484,6 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         Orden o = super.find(codOrden);
         o.setDeLaCasa(deLaCasa);
         super.edit(o);
-        if (deLaCasa) {
-            ipvController.consumirPorLaCasa(o.getProductovOrdenList());
-        } else {
-            ipvController.devolverPorLaCasa(o.getProductovOrdenList());
-        }
         return toJsonString(Response.Status.OK, o);
     }//TODO: METODoS ARCAICOS
 
