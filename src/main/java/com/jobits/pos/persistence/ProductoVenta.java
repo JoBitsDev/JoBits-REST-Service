@@ -5,9 +5,9 @@
  */
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.jobits.utils.utils;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -21,10 +21,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import com.jobits.utils.R;
 
 /**
  * FirstDream
@@ -32,90 +29,78 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Jorge
  *
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class ,property = "codigoProducto",scope = ProductoVenta.class)
 @Entity
 @Table(name = "producto_venta")
-@XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "ProductoVenta.findAll", query = "SELECT p FROM ProductoVenta p"),
-    @NamedQuery(name = "ProductoVenta.findByPCod", query = "SELECT p FROM ProductoVenta p WHERE p.pCod = :pCod"),
+    @NamedQuery(name = "ProductoVenta.findByPCod", query = "SELECT p FROM ProductoVenta p WHERE p.codigoProducto = :codigoProducto"),
     @NamedQuery(name = "ProductoVenta.findByNombre", query = "SELECT p FROM ProductoVenta p WHERE p.nombre = :nombre"),
     @NamedQuery(name = "ProductoVenta.findByPrecioVenta", query = "SELECT p FROM ProductoVenta p WHERE p.precioVenta = :precioVenta"),
     @NamedQuery(name = "ProductoVenta.findByGanancia", query = "SELECT p FROM ProductoVenta p WHERE p.ganancia = :ganancia"),
     @NamedQuery(name = "ProductoVenta.findByGasto", query = "SELECT p FROM ProductoVenta p WHERE p.gasto = :gasto"),
     @NamedQuery(name = "ProductoVenta.findByDescripcion", query = "SELECT p FROM ProductoVenta p WHERE p.descripcion = :descripcion"),
-    @NamedQuery(name = "ProductoVenta.findByVisible", query = "SELECT p FROM ProductoVenta p WHERE p.visible = :visible"),
-    @NamedQuery(name = "ProductoVenta.findByPagoPorVenta", query = "SELECT p FROM ProductoVenta p WHERE p.pagoPorVenta = :pagoPorVenta")})
-public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
+    @NamedQuery(name = "ProductoVenta.findByVisible", query = "SELECT p FROM ProductoVenta p WHERE p.visible = :visible")})
+public class ProductoVenta implements Serializable,Comparable<ProductoVenta>{
+
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 7)
     @Column(name = "p_cod")
-    private String pCod;
+    private String codigoProducto;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 100)
     @Column(name = "nombre")
     private String nombre;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "precio_venta")
     private float precioVenta;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @JsonIgnore
     @Column(name = "ganancia")
     private Float ganancia;
     @Column(name = "gasto")
-    @JsonIgnore
     private Float gasto;
-    @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
     @Column(name = "visible")
-    @JsonIgnore
     private Boolean visible;
-    @Column(name = "pago_por_venta")
-    @JsonIgnore
-    private Float pagoPorVenta;
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta", orphanRemoval = true)
     private List<ProductoInsumo> productoInsumoList;
     @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")
     @ManyToOne
-    @JsonIgnore
     private Cocina cocinacodCocina;
     @JoinColumn(name = "seccionnombre_seccion", referencedColumnName = "nombre_seccion")
     @ManyToOne
     private Seccion seccionnombreSeccion;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
     @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
     private List<ProductovOrden> productovOrdenList;
+   @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productoVenta")
-    @JsonIgnore
     private List<IpvVentaRegistro> ipvVentaRegistroList;
+
+    @Column(name = "pago_por_venta")
+    private Float pagoPorVenta;
 
     public ProductoVenta() {
     }
 
     public ProductoVenta(String pCod) {
-        this.pCod = pCod;
+        this.codigoProducto = pCod;
     }
 
     public ProductoVenta(String pCod, String nombre, float precioVenta) {
-        this.pCod = pCod;
+        this.codigoProducto = pCod;
         this.nombre = nombre;
         this.precioVenta = precioVenta;
     }
 
-    public String getPCod() {
-        return pCod;
+    public String getCodigoProducto() {
+        return codigoProducto;
     }
 
-    public void setPCod(String pCod) {
-        this.pCod = pCod;
+    public void setCodigoProducto(String pCod) {
+        this.codigoProducto = pCod;
     }
 
     public String getNombre() {
@@ -166,15 +151,6 @@ public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
         this.visible = visible;
     }
 
-    public Float getPagoPorVenta() {
-        return pagoPorVenta;
-    }
-
-    public void setPagoPorVenta(Float pagoPorVenta) {
-        this.pagoPorVenta = pagoPorVenta;
-    }
-
-    @XmlTransient
     public List<ProductoInsumo> getProductoInsumoList() {
         return productoInsumoList;
     }
@@ -199,7 +175,6 @@ public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
         this.seccionnombreSeccion = seccionnombreSeccion;
     }
 
-    @XmlTransient
     public List<ProductovOrden> getProductovOrdenList() {
         return productovOrdenList;
     }
@@ -211,7 +186,7 @@ public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (pCod != null ? pCod.hashCode() : 0);
+        hash += (codigoProducto != null ? codigoProducto.hashCode() : 0);
         return hash;
     }
 
@@ -222,7 +197,7 @@ public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
             return false;
         }
         ProductoVenta other = (ProductoVenta) object;
-        if ((this.pCod == null && other.pCod != null) || (this.pCod != null && !this.pCod.equals(other.pCod))) {
+        if ((this.codigoProducto == null && other.codigoProducto != null) || (this.codigoProducto != null && !this.codigoProducto.equals(other.codigoProducto))) {
             return false;
         }
         return true;
@@ -230,10 +205,17 @@ public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
 
     @Override
     public String toString() {
-        return nombre + " (" + utils.setDosLugaresDecimales(precioVenta) + ")";
+        return nombre + " (" + precioVenta + R.getMainCoin() + ")";
+    }
+    
+    public Float getPagoPorVenta() {
+        return pagoPorVenta;
     }
 
-    @XmlTransient
+    public void setPagoPorVenta(Float pagoPorVenta) {
+        this.pagoPorVenta = pagoPorVenta;
+    }
+
     public List<IpvVentaRegistro> getIpvVentaRegistroList() {
         return ipvVentaRegistroList;
     }
@@ -244,7 +226,6 @@ public class ProductoVenta implements Serializable, Comparable<ProductoVenta> {
 
     @Override
     public int compareTo(ProductoVenta o) {
-        return getNombre().compareToIgnoreCase(o.getNombre());
+        return this.nombre.compareTo(o.getNombre());
     }
-
 }

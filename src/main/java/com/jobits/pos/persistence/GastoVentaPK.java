@@ -3,44 +3,41 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
+@JsonRootName(value = "gastoVentaPK")
 @Embeddable
 public class GastoVentaPK implements Serializable {
 
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
     @Column(name = "gastocod_gasto")
     private String gastocodGasto;
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "ventafecha")
-    @Temporal(TemporalType.DATE)
-    private Date ventafecha;
+    @Column(name = "ventaid")
+    private Integer ventaid;
 
     public GastoVentaPK() {
     }
 
-    public GastoVentaPK(String gastocodGasto, Date ventafecha) {
+    public GastoVentaPK(String gastocodGasto, Integer ventaid) {
         this.gastocodGasto = gastocodGasto;
-        this.ventafecha = ventafecha;
+        this.ventaid = ventaid;
     }
 
     public String getGastocodGasto() {
@@ -51,33 +48,38 @@ public class GastoVentaPK implements Serializable {
         this.gastocodGasto = gastocodGasto;
     }
 
-    public Date getVentafecha() {
-        return ventafecha;
+    public int getVentafecha() {
+        return ventaid;
     }
 
-    public void setVentafecha(Date ventafecha) {
-        this.ventafecha = ventafecha;
+    public void setVentafecha(int ventaid) {
+        this.ventaid = ventaid;
     }
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (gastocodGasto != null ? gastocodGasto.hashCode() : 0);
-        hash += (ventafecha != null ? ventafecha.hashCode() : 0);
+        int hash = 3;
+        hash = 67 * hash + Objects.hashCode(this.gastocodGasto);
+        hash = 67 * hash + Objects.hashCode(this.ventaid);
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof GastoVentaPK)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        GastoVentaPK other = (GastoVentaPK) object;
-        if ((this.gastocodGasto == null && other.gastocodGasto != null) || (this.gastocodGasto != null && !this.gastocodGasto.equals(other.gastocodGasto))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        if ((this.ventafecha == null && other.ventafecha != null) || (this.ventafecha != null && !this.ventafecha.equals(other.ventafecha))) {
+        final GastoVentaPK other = (GastoVentaPK) obj;
+        if (!Objects.equals(this.gastocodGasto, other.gastocodGasto)) {
+            return false;
+        }
+        if (!Objects.equals(this.ventaid, other.ventaid)) {
             return false;
         }
         return true;
@@ -85,7 +87,7 @@ public class GastoVentaPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.GastoVentaPK[ gastocodGasto=" + gastocodGasto + ", ventafecha=" + ventafecha + " ]";
+        return "restManager.persistencia.GastoVentaPK[ gastocodGasto=" + gastocodGasto + ", ventaid=" + ventaid + " ]";
     }
 
 }

@@ -3,12 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.awt.Desktop;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -16,87 +21,94 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.validation.constraints.Size;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "productovOrdenPK", scope = ProductovOrden.class)
 @Entity
 @Table(name = "productov_orden")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "ProductovOrden.findAll", query = "SELECT p FROM ProductovOrden p")
-    , @NamedQuery(name = "ProductovOrden.findByProductoVentapCod", query = "SELECT p FROM ProductovOrden p WHERE p.productovOrdenPK.productoVentapCod = :productoVentapCod")
-    , @NamedQuery(name = "ProductovOrden.findByOrdencodOrden", query = "SELECT p FROM ProductovOrden p WHERE p.productovOrdenPK.ordencodOrden = :ordencodOrden")
-    , @NamedQuery(name = "ProductovOrden.findByCantidad", query = "SELECT p FROM ProductovOrden p WHERE p.cantidad = :cantidad")
-    , @NamedQuery(name = "ProductovOrden.findByEnviadosacocina", query = "SELECT p FROM ProductovOrden p WHERE p.enviadosacocina = :enviadosacocina")
-    , @NamedQuery(name = "ProductovOrden.findByNumeroComensal", query = "SELECT p FROM ProductovOrden p WHERE p.numeroComensal = :numeroComensal")
-    , @NamedQuery(name = "ProductovOrden.findByListoParaRecoger", query = "SELECT p FROM ProductovOrden p WHERE p.listoParaRecoger = :listoParaRecoger")})
+    @NamedQuery(name = "ProductovOrden.findAll", query = "SELECT p FROM ProductovOrden p"),
+    @NamedQuery(name = "ProductovOrden.findByCantidad", query = "SELECT p FROM ProductovOrden p WHERE p.cantidad = :cantidad"),
+    @NamedQuery(name = "ProductovOrden.findByEnviadosacocina", query = "SELECT p FROM ProductovOrden p WHERE p.enviadosacocina = :enviadosacocina"),
+    @NamedQuery(name = "ProductovOrden.findByNumeroComensal", query = "SELECT p FROM ProductovOrden p WHERE p.numeroComensal = :numeroComensal"),
+    @NamedQuery(name = "ProductovOrden.findByListoParaRecoger", query = "SELECT p FROM ProductovOrden p WHERE p.listoParaRecoger = :listoParaRecoger")})
 public class ProductovOrden implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected ProductovOrdenPK productovOrdenPK;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "cantidad")
-    private float cantidad;
+    @Column(name = "precio_vendido")
+    private float precioVendido;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Column(name = "nombre_producto_vendido")
+    private String nombreProductoVendido;
+    @OneToMany(mappedBy = "agregadoA", orphanRemoval = true)
+    private List<ProductovOrden> agregos;
+    @JoinColumn(name = "agregado_a", referencedColumnName = "id")
+    @ManyToOne
+    private ProductovOrden agregadoA;
+
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "enviadosacocina")
     private Float enviadosacocina;
+
+    private static final long serialVersionUID = 1L;
+    @Basic(optional = false)
+    @Column(name = "cantidad")
+    private float cantidad;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id_producto_orden")
+    @SequenceGenerator(name = "id_producto_orden", allocationSize = 1)
+    private Integer id;
     @Column(name = "numero_comensal")
     private Integer numeroComensal;
     @Column(name = "listo_para_recoger")
-    @JsonIgnore
     private Boolean listoParaRecoger;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productovOrden")
     private List<NotificacionEnvioCocina> notificacionEnvioCocinaList;
-    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "productovOrden")
     private Nota nota;
-    @JoinColumn(name = "ordencod_orden", referencedColumnName = "cod_orden", insertable = false, updatable = false)
+    @JoinColumn(name = "ordencod_orden", referencedColumnName = "cod_orden")
     @ManyToOne(optional = false)
-    @JsonBackReference
     private Orden orden;
-    @JoinColumn(name = "producto_ventap_cod", referencedColumnName = "p_cod", insertable = false, updatable = false)
+    @JoinColumn(name = "producto_ventap_cod", referencedColumnName = "p_cod")
     @ManyToOne(optional = false)
     private ProductoVenta productoVenta;
 
     public ProductovOrden() {
     }
 
-    public ProductovOrden(ProductovOrdenPK productovOrdenPK) {
-        this.productovOrdenPK = productovOrdenPK;
+    public ProductovOrden(Integer id) {
+        this.id = id;
     }
 
-    public ProductovOrden(ProductovOrdenPK productovOrdenPK, float cantidad) {
-        this.productovOrdenPK = productovOrdenPK;
+    public ProductovOrden(Integer id, float cantidad, float precioVendido, String nombreProductoVendido) {
+        this.id = id;
         this.cantidad = cantidad;
-    }
-
-    public ProductovOrden(String productoVentapCod, String ordencodOrden) {
-        this.productovOrdenPK = new ProductovOrdenPK(productoVentapCod, ordencodOrden);
-    }
-
-    public ProductovOrdenPK getProductovOrdenPK() {
-        return productovOrdenPK;
-    }
-
-    public void setProductovOrdenPK(ProductovOrdenPK productovOrdenPK) {
-        this.productovOrdenPK = productovOrdenPK;
+        this.precioVendido = precioVendido;
+        this.nombreProductoVendido = nombreProductoVendido;
     }
 
     public float getCantidad() {
@@ -107,12 +119,28 @@ public class ProductovOrden implements Serializable {
         this.cantidad = cantidad;
     }
 
-    public Float getEnviadosacocina() {
-        return enviadosacocina;
+    public float getPrecioVendido() {
+        return precioVendido;
     }
 
-    public void setEnviadosacocina(Float enviadosacocina) {
-        this.enviadosacocina = enviadosacocina;
+    public void setPrecioVendido(float precioVendido) {
+        this.precioVendido = precioVendido;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNombreProductoVendido() {
+        return nombreProductoVendido;
+    }
+
+    public void setNombreProductoVendido(String nombreProductoVendido) {
+        this.nombreProductoVendido = nombreProductoVendido;
     }
 
     public Integer getNumeroComensal() {
@@ -131,7 +159,6 @@ public class ProductovOrden implements Serializable {
         this.listoParaRecoger = listoParaRecoger;
     }
 
-    @XmlTransient
     public List<NotificacionEnvioCocina> getNotificacionEnvioCocinaList() {
         return notificacionEnvioCocinaList;
     }
@@ -167,7 +194,7 @@ public class ProductovOrden implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (productovOrdenPK != null ? productovOrdenPK.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -178,7 +205,7 @@ public class ProductovOrden implements Serializable {
             return false;
         }
         ProductovOrden other = (ProductovOrden) object;
-        if ((this.productovOrdenPK == null && other.productovOrdenPK != null) || (this.productovOrdenPK != null && !this.productovOrdenPK.equals(other.productovOrdenPK))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -186,7 +213,30 @@ public class ProductovOrden implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.ProductovOrden[ productovOrdenPK=" + productovOrdenPK + " ]";
+        return getOrden() + "_" + getProductoVenta();
     }
 
+    public Float getEnviadosacocina() {
+        return enviadosacocina;
+    }
+
+    public void setEnviadosacocina(Float enviadosacocina) {
+        this.enviadosacocina = enviadosacocina;
+    }
+
+    public List<ProductovOrden> getAgregos() {
+        return agregos;
+    }
+
+    public void setAgregos(List<ProductovOrden> agregos) {
+        this.agregos = agregos;
+    }
+
+    public ProductovOrden getAgregadoA() {
+        return agregadoA;
+    }
+
+    public void setAgregadoA(ProductovOrden agregadoA) {
+        this.agregadoA = agregadoA;
+    }
 }

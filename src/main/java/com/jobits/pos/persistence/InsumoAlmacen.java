@@ -5,10 +5,6 @@
  */
 package com.jobits.pos.persistence;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -18,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -26,19 +21,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Jorge
  *
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "insumo_almacen")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "InsumoAlmacen.findAll", query = "SELECT i FROM InsumoAlmacen i")
-    , @NamedQuery(name = "InsumoAlmacen.findByInsumocodInsumo", query = "SELECT i FROM InsumoAlmacen i WHERE i.insumoAlmacenPK.insumocodInsumo = :insumocodInsumo")
-    ,@NamedQuery(name = "InsumoAlmacen.findByAlmacenInsumo", query = "SELECT i FROM InsumoAlmacen i "
-            + "WHERE i.insumoAlmacenPK.almacencodAlmacen = :almacencodAlmacen AND i.insumoAlmacenPK.insumocodInsumo = :insumo")
-    , @NamedQuery(name = "InsumoAlmacen.findByAlmacencodAlmacen", query = "SELECT i FROM InsumoAlmacen i WHERE i.insumoAlmacenPK.almacencodAlmacen = :almacencodAlmacen")
-    , @NamedQuery(name = "InsumoAlmacen.findByCantidad", query = "SELECT i FROM InsumoAlmacen i WHERE i.cantidad = :cantidad")
-    , @NamedQuery(name = "InsumoAlmacen.findByValorMonetario", query = "SELECT i FROM InsumoAlmacen i WHERE i.valorMonetario = :valorMonetario")})
-public class InsumoAlmacen implements Serializable,Comparable<InsumoAlmacen> {
+    @NamedQuery(name = "InsumoAlmacen.findAll", query = "SELECT i FROM InsumoAlmacen i"),
+    @NamedQuery(name = "InsumoAlmacen.findByInsumocodInsumo", query = "SELECT i FROM InsumoAlmacen i WHERE i.insumoAlmacenPK.insumocodInsumo = :insumocodInsumo"),
+    @NamedQuery(name = "InsumoAlmacen.findByAlmacencodAlmacen", query = "SELECT i FROM InsumoAlmacen i WHERE i.insumoAlmacenPK.almacencodAlmacen = :almacencodAlmacen"),
+    @NamedQuery(name = "InsumoAlmacen.findByAlmacenInsumo", query = "SELECT i FROM InsumoAlmacen i "
+            + "WHERE i.insumoAlmacenPK.almacencodAlmacen = :almacencodAlmacen AND i.insumoAlmacenPK.insumocodInsumo = :insumo"),
+    @NamedQuery(name = "InsumoAlmacen.findByCantidad", query = "SELECT i FROM InsumoAlmacen i WHERE i.cantidad = :cantidad"),
+    @NamedQuery(name = "InsumoAlmacen.findByValorMonetario", query = "SELECT i FROM InsumoAlmacen i WHERE i.valorMonetario = :valorMonetario")})
+public class InsumoAlmacen implements Serializable, Comparable<InsumoAlmacen> {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -50,7 +43,6 @@ public class InsumoAlmacen implements Serializable,Comparable<InsumoAlmacen> {
     private Float valorMonetario;
     @JoinColumn(name = "almacencod_almacen", referencedColumnName = "cod_almacen", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    @JsonIgnore
     private Almacen almacen;
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
@@ -134,7 +126,7 @@ public class InsumoAlmacen implements Serializable,Comparable<InsumoAlmacen> {
 
     @Override
     public int compareTo(InsumoAlmacen o) {
-        return getInsumo().getNombre().compareToIgnoreCase(o.getInsumo().getNombre());
+        return this.getInsumo().getNombre().compareTo(o.getInsumo().getNombre());
     }
 
 }

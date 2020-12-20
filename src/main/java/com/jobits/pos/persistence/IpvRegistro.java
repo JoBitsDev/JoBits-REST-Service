@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.jobits.pos.persistence;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -17,35 +19,38 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.jobits.utils.R;
 
 /**
  * FirstDream
- *
  * @author Jorge
- *
+ * 
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property =  "ipvRegistroPK",scope = IpvRegistro.class)
 @Entity
 @Table(name = "ipv_registro")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "IpvRegistro.findAll", query = "SELECT i FROM IpvRegistro i")
-    , @NamedQuery(name = "IpvRegistro.findByIpvinsumocodInsumo", query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvinsumocodInsumo = :ipvinsumocodInsumo")
-    , @NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocina", query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvcocinacodCocina = :ipvcocinacodCocina")
-    , @NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocinaAndFecha",
-            query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvcocinacodCocina = :ipvcocinacodCocina AND i.ipvRegistroPK.fecha = :fecha")
-    ,@NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo",
+    @NamedQuery(name = "IpvRegistro.findAll", query = "SELECT i FROM IpvRegistro i"),
+    @NamedQuery(name = "IpvRegistro.findByIpvinsumocodInsumo", query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvinsumocodInsumo = :ipvinsumocodInsumo"),
+    @NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocina", 
+            query = "SELECT DISTINCT i.ipvRegistroPK.fecha FROM IpvRegistro i "
+                    + "WHERE i.ipvRegistroPK.ipvcocinacodCocina = :ipvcocinacodCocina  "
+                    + "ORDER BY i.ipvRegistroPK.fecha DESC"),
+    @NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocinaAndFecha", 
+            query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvcocinacodCocina = :ipvcocinacodCocina AND i.ipvRegistroPK.fecha = :fecha"),
+    @NamedQuery(name = "IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo", 
             query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.ipvcocinacodCocina = :ipvcocinacodCocina AND "
-            + "i.ipvRegistroPK.fecha = :fecha AND i.ipvRegistroPK.ipvinsumocodInsumo = :codinsumo")
-    , @NamedQuery(name = "IpvRegistro.findByFecha", query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.fecha = :fecha")
-    , @NamedQuery(name = "IpvRegistro.findByInicio", query = "SELECT i FROM IpvRegistro i WHERE i.inicio = :inicio")
-    , @NamedQuery(name = "IpvRegistro.findByEntrada", query = "SELECT i FROM IpvRegistro i WHERE i.entrada = :entrada")
-    , @NamedQuery(name = "IpvRegistro.findByDisponible", query = "SELECT i FROM IpvRegistro i WHERE i.disponible = :disponible")
-    , @NamedQuery(name = "IpvRegistro.findByConsumo", query = "SELECT i FROM IpvRegistro i WHERE i.consumo = :consumo")
-    , @NamedQuery(name = "IpvRegistro.findByConsumoReal", query = "SELECT i FROM IpvRegistro i WHERE i.consumoReal = :consumoReal")
-    , @NamedQuery(name = "IpvRegistro.findByFinal1", query = "SELECT i FROM IpvRegistro i WHERE i.final1 = :final1")
-    , @NamedQuery(name = "IpvRegistro.findByFinalReal", query = "SELECT i FROM IpvRegistro i WHERE i.finalReal = :finalReal")})
-public class IpvRegistro implements Serializable, Comparable<IpvRegistro> {
+                    + "i.ipvRegistroPK.fecha = :fecha AND i.ipvRegistroPK.ipvinsumocodInsumo = :codinsumo"),
+    
+    @NamedQuery(name = "IpvRegistro.findByFecha", query = "SELECT i FROM IpvRegistro i WHERE i.ipvRegistroPK.fecha = :fecha"),
+    @NamedQuery(name = "IpvRegistro.findByInicio", query = "SELECT i FROM IpvRegistro i WHERE i.inicio = :inicio"),
+    @NamedQuery(name = "IpvRegistro.findByEntrada", query = "SELECT i FROM IpvRegistro i WHERE i.entrada = :entrada"),
+    @NamedQuery(name = "IpvRegistro.findByDisponible", query = "SELECT i FROM IpvRegistro i WHERE i.disponible = :disponible"),
+    @NamedQuery(name = "IpvRegistro.findByConsumo", query = "SELECT i FROM IpvRegistro i WHERE i.consumo = :consumo"),
+    @NamedQuery(name = "IpvRegistro.findByConsumoReal", query = "SELECT i FROM IpvRegistro i WHERE i.consumoReal = :consumoReal"),
+    @NamedQuery(name = "IpvRegistro.findByFinal1", query = "SELECT i FROM IpvRegistro i WHERE i.finalCalculado = :final1"),
+    @NamedQuery(name = "IpvRegistro.findByFinalReal", query = "SELECT i FROM IpvRegistro i WHERE i.finalAjustado = :finalReal")})
+public class IpvRegistro implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -62,14 +67,13 @@ public class IpvRegistro implements Serializable, Comparable<IpvRegistro> {
     @Column(name = "consumo_real")
     private Float consumoReal;
     @Column(name = "final")
-    private Float final1;
+    private Float finalCalculado;
     @Column(name = "final_real")
-    private Float finalReal;
+    private Float finalAjustado;
     @JoinColumns({
-        @JoinColumn(name = "ipvinsumocod_insumo", referencedColumnName = "insumocod_insumo", insertable = false, updatable = false)
-        , @JoinColumn(name = "ipvcocinacod_cocina", referencedColumnName = "cocinacod_cocina", insertable = false, updatable = false)})
+        @JoinColumn(name = "ipvinsumocod_insumo", referencedColumnName = "insumocod_insumo", insertable = false, updatable = false),
+        @JoinColumn(name = "ipvcocinacod_cocina", referencedColumnName = "cocinacod_cocina", insertable = false, updatable = false)})
     @ManyToOne(optional = false)
-    @JsonIgnore
     private Ipv ipv;
 
     public IpvRegistro() {
@@ -131,20 +135,20 @@ public class IpvRegistro implements Serializable, Comparable<IpvRegistro> {
         this.consumoReal = consumoReal;
     }
 
-    public Float getFinal1() {
-        return final1;
+    public Float getFinalCalculado() {
+        return finalCalculado;
     }
 
-    public void setFinal1(Float final1) {
-        this.final1 = final1;
+    public void setFinalCalculado(Float finalCalculado) {
+        this.finalCalculado = finalCalculado;
     }
 
-    public Float getFinalReal() {
-        return finalReal;
+    public Float getFinalAjustado() {
+        return finalAjustado;
     }
 
-    public void setFinalReal(Float finalReal) {
-        this.finalReal = finalReal;
+    public void setFinalAjustado(Float finalAjustado) {
+        this.finalAjustado = finalAjustado;
     }
 
     public Ipv getIpv() {
@@ -177,12 +181,7 @@ public class IpvRegistro implements Serializable, Comparable<IpvRegistro> {
 
     @Override
     public String toString() {
-        return "com.restmanager.IpvRegistro[ ipvRegistroPK=" + ipvRegistroPK + " ]";
-    }
-
-    @Override
-    public int compareTo(IpvRegistro o) {
-        return getIpvRegistroPK().getIpvinsumocodInsumo().compareToIgnoreCase(o.getIpvRegistroPK().getIpvinsumocodInsumo());
+        return R.DATE_FORMAT.format(getIpvRegistroPK().getFecha());
     }
 
 }

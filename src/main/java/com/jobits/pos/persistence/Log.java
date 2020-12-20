@@ -14,9 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -25,28 +22,22 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "log")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Log.findAll", query = "SELECT l FROM Log l")
-    , @NamedQuery(name = "Log.findById", query = "SELECT l FROM Log l WHERE l.id = :id")
-    , @NamedQuery(name = "Log.findByTipo", query = "SELECT l FROM Log l WHERE l.tipo = :tipo")
-    , @NamedQuery(name = "Log.findByDescripcion", query = "SELECT l FROM Log l WHERE l.descripcion = :descripcion")})
+    @NamedQuery(name = "Log.findAll", query = "SELECT l FROM Log l"),
+    @NamedQuery(name = "Log.findById", query = "SELECT l FROM Log l WHERE l.id = :id"),
+    @NamedQuery(name = "Log.findByTipo", query = "SELECT l FROM Log l WHERE l.tipo = :tipo"),
+    @NamedQuery(name = "Log.findByDescripcion", query = "SELECT l FROM Log l WHERE l.descripcion = :descripcion")})
 public class Log implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
     @Column(name = "id")
     private Long id;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
     @Column(name = "tipo")
     private String tipo;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 255)
     @Column(name = "descripcion")
     private String descripcion;
 
@@ -109,7 +100,7 @@ public class Log implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Log[ id=" + id + " ]";
+        return "restManager.persistencia.Log[ id=" + id + " ]";
     }
 
 }

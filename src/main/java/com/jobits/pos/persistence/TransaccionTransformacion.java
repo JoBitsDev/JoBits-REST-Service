@@ -15,7 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -24,16 +23,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "transaccion_transformacion")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "TransaccionTransformacion.findAll", query = "SELECT t FROM TransaccionTransformacion t")
-    , @NamedQuery(name = "TransaccionTransformacion.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionTransformacion t WHERE t.transaccionTransformacionPK.transaccionnoTransaccion = :transaccionnoTransaccion")
-    , @NamedQuery(name = "TransaccionTransformacion.findByInsumocodInsumo", query = "SELECT t FROM TransaccionTransformacion t WHERE t.transaccionTransformacionPK.insumocodInsumo = :insumocodInsumo")
-    , @NamedQuery(name = "TransaccionTransformacion.findByCantidadUsada", query = "SELECT t FROM TransaccionTransformacion t WHERE t.cantidadUsada = :cantidadUsada")
-    , @NamedQuery(name = "TransaccionTransformacion.findByCantidadCreada", query = "SELECT t FROM TransaccionTransformacion t WHERE t.cantidadCreada = :cantidadCreada")
-    , @NamedQuery(name = "TransaccionTransformacion.findByDireccionInversa", query = "SELECT t FROM TransaccionTransformacion t WHERE t.direccionInversa = :direccionInversa")
-    , @NamedQuery(name = "TransaccionTransformacion.findByCostoUnitario", query = "SELECT t FROM TransaccionTransformacion t WHERE t.costoUnitario = :costoUnitario")})
+    @NamedQuery(name = "TransaccionTransformacion.findAll", query = "SELECT t FROM TransaccionTransformacion t"),
+    @NamedQuery(name = "TransaccionTransformacion.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionTransformacion t WHERE t.transaccionTransformacionPK.transaccionnoTransaccion = :transaccionnoTransaccion"),
+    @NamedQuery(name = "TransaccionTransformacion.findByInsumocodInsumo", query = "SELECT t FROM TransaccionTransformacion t WHERE t.transaccionTransformacionPK.insumocodInsumo = :insumocodInsumo"),
+    @NamedQuery(name = "TransaccionTransformacion.findByCantidadUsada", query = "SELECT t FROM TransaccionTransformacion t WHERE t.cantidadUsada = :cantidadUsada"),
+    @NamedQuery(name = "TransaccionTransformacion.findByCantidadCreada", query = "SELECT t FROM TransaccionTransformacion t WHERE t.cantidadCreada = :cantidadCreada"),
+    @NamedQuery(name = "TransaccionTransformacion.findByDireccionInversa", query = "SELECT t FROM TransaccionTransformacion t WHERE t.direccionInversa = :direccionInversa")})
 public class TransaccionTransformacion implements Serializable {
+
+    @Column(name = "costo_unitario")
+    private Float costoUnitario;
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -45,8 +45,6 @@ public class TransaccionTransformacion implements Serializable {
     private Float cantidadCreada;
     @Column(name = "direccion_inversa")
     private Boolean direccionInversa;
-    @Column(name = "costo_unitario")
-    private Float costoUnitario;
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Insumo insumo;
@@ -97,14 +95,6 @@ public class TransaccionTransformacion implements Serializable {
         this.direccionInversa = direccionInversa;
     }
 
-    public Float getCostoUnitario() {
-        return costoUnitario;
-    }
-
-    public void setCostoUnitario(Float costoUnitario) {
-        this.costoUnitario = costoUnitario;
-    }
-
     public Insumo getInsumo() {
         return insumo;
     }
@@ -135,7 +125,7 @@ public class TransaccionTransformacion implements Serializable {
             return false;
         }
         TransaccionTransformacion other = (TransaccionTransformacion) object;
-        if ((this.transaccionTransformacionPK == null && other.transaccionTransformacionPK != null) || (this.transaccionTransformacionPK != null && !this.transaccionTransformacionPK.equals(other.transaccionTransformacionPK))) {
+        if (!this.insumo.equals(other.insumo)) {
             return false;
         }
         return true;
@@ -143,7 +133,15 @@ public class TransaccionTransformacion implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.TransaccionTransformacion[ transaccionTransformacionPK=" + transaccionTransformacionPK + " ]";
+        return "restManager.persistencia.TransaccionTransformacion[ transaccionTransformacionPK=" + transaccionTransformacionPK + " ]";
+    }
+
+    public Float getCostoUnitario() {
+        return costoUnitario;
+    }
+
+    public void setCostoUnitario(Float costoUnitario) {
+        this.costoUnitario = costoUnitario;
     }
 
 }

@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -21,46 +23,42 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "notificacionEnvioCocinaPK", scope = NotificacionEnvioCocina.class)
 @Entity
 @Table(name = "notificacion_envio_cocina")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "NotificacionEnvioCocina.findAll", query = "SELECT n FROM NotificacionEnvioCocina n")
-    , @NamedQuery(name = "NotificacionEnvioCocina.findByCocinacodCocina", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.notificacionEnvioCocinaPK.cocinacodCocina = :cocinacodCocina")
-    , @NamedQuery(name = "NotificacionEnvioCocina.findByProductovOrdenproductoVentapCod", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.notificacionEnvioCocinaPK.productovOrdenproductoVentapCod = :productovOrdenproductoVentapCod")
-    , @NamedQuery(name = "NotificacionEnvioCocina.findByProductovOrdenordencodOrden", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.notificacionEnvioCocinaPK.productovOrdenordencodOrden = :productovOrdenordencodOrden")
-    , @NamedQuery(name = "NotificacionEnvioCocina.findByCantidad", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.cantidad = :cantidad")
-    , @NamedQuery(name = "NotificacionEnvioCocina.findByHoraNotificacion", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.horaNotificacion = :horaNotificacion")
-    , @NamedQuery(name = "NotificacionEnvioCocina.findByIpDependiente", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.ipDependiente = :ipDependiente")})
+    @NamedQuery(name = "NotificacionEnvioCocina.findAll", query = "SELECT n FROM NotificacionEnvioCocina n"),
+    @NamedQuery(name = "NotificacionEnvioCocina.findByCocinacodCocina", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.notificacionEnvioCocinaPK.cocinacodCocina = :cocinacodCocina"),
+    @NamedQuery(name = "NotificacionEnvioCocina.findByCantidad", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.cantidad = :cantidad"),
+    @NamedQuery(name = "NotificacionEnvioCocina.findByHoraNotificacion", query = "SELECT n FROM NotificacionEnvioCocina n WHERE n.horaNotificacion = :horaNotificacion")})
 public class NotificacionEnvioCocina implements Serializable {
+
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "cantidad")
+    private Float cantidad;
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected NotificacionEnvioCocinaPK notificacionEnvioCocinaPK;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "cantidad")
-    private Float cantidad;
     @Column(name = "hora_notificacion")
     @Temporal(TemporalType.TIME)
     private Date horaNotificacion;
-    @Size(max = 20)
-    @Column(name = "ip_dependiente")
-    private String ipDependiente;
     @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Cocina cocina;
-    @JoinColumns({
-        @JoinColumn(name = "productov_ordenproducto_ventap_cod", referencedColumnName = "producto_ventap_cod", insertable = false, updatable = false)
-        , @JoinColumn(name = "productov_ordenordencod_orden", referencedColumnName = "ordencod_orden", insertable = false, updatable = false)})
+    @JoinColumn(name = "productov_ordenid", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private ProductovOrden productovOrden;
+
+    @Column(name = "ip_dependiente")
+    private String ip_dependiente;
 
     public NotificacionEnvioCocina() {
     }
@@ -69,8 +67,8 @@ public class NotificacionEnvioCocina implements Serializable {
         this.notificacionEnvioCocinaPK = notificacionEnvioCocinaPK;
     }
 
-    public NotificacionEnvioCocina(String cocinacodCocina, String productovOrdenproductoVentapCod, String productovOrdenordencodOrden) {
-        this.notificacionEnvioCocinaPK = new NotificacionEnvioCocinaPK(cocinacodCocina, productovOrdenproductoVentapCod, productovOrdenordencodOrden);
+    public NotificacionEnvioCocina(String cocinacodCocina, int productovOrdenId) {
+        this.notificacionEnvioCocinaPK = new NotificacionEnvioCocinaPK(cocinacodCocina, productovOrdenId);
     }
 
     public NotificacionEnvioCocinaPK getNotificacionEnvioCocinaPK() {
@@ -81,28 +79,12 @@ public class NotificacionEnvioCocina implements Serializable {
         this.notificacionEnvioCocinaPK = notificacionEnvioCocinaPK;
     }
 
-    public Float getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Float cantidad) {
-        this.cantidad = cantidad;
-    }
-
     public Date getHoraNotificacion() {
         return horaNotificacion;
     }
 
     public void setHoraNotificacion(Date horaNotificacion) {
         this.horaNotificacion = horaNotificacion;
-    }
-
-    public String getIpDependiente() {
-        return ipDependiente;
-    }
-
-    public void setIpDependiente(String ipDependiente) {
-        this.ipDependiente = ipDependiente;
     }
 
     public Cocina getCocina() {
@@ -119,6 +101,14 @@ public class NotificacionEnvioCocina implements Serializable {
 
     public void setProductovOrden(ProductovOrden productovOrden) {
         this.productovOrden = productovOrden;
+    }
+
+    public String getIp_dependiente() {
+        return ip_dependiente;
+    }
+
+    public void setIp_dependiente(String ip_dependiente) {
+        this.ip_dependiente = ip_dependiente;
     }
 
     @Override
@@ -143,7 +133,15 @@ public class NotificacionEnvioCocina implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.NotificacionEnvioCocina[ notificacionEnvioCocinaPK=" + notificacionEnvioCocinaPK + " ]";
+        return "restManager.persistencia.NotificacionEnvioCocina[ notificacionEnvioCocinaPK=" + notificacionEnvioCocinaPK + " ]";
+    }
+
+    public Float getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Float cantidad) {
+        this.cantidad = cantidad;
     }
 
 }

@@ -436,14 +436,14 @@ public class VentaCalculator {
         while (!b.isEmpty()) {
             boolean founded = false;
             for (int j = 0; j < pivot.size() && !founded; j++) {
-                if (b.get(0).getProductoVenta().getPCod().equals(
-                        pivot.get(j).getProductoVenta().getPCod())) {
+                if (b.get(0).getProductoVenta().getCodigoProducto().equals(
+                        pivot.get(j).getProductoVenta().getCodigoProducto())) {
                     founded = true;
                     pivot.get(j).setCantidad(pivot.get(j).getCantidad() + b.get(0).getCantidad());
                 }
             }
             if (!founded && (c == null || b.get(0).getProductoVenta().getCocinacodCocina().equals(c))) {
-                ProductovOrden po = new ProductovOrden(b.get(0).getProductovOrdenPK());
+                ProductovOrden po = new ProductovOrden(b.get(0).getId());
                 po.setCantidad(b.get(0).getCantidad());
                 po.setEnviadosacocina(b.get(0).getEnviadosacocina());
                 po.setOrden(b.get(0).getOrden());

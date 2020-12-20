@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
 import java.io.Serializable;
@@ -12,91 +11,77 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "cliente")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c")
-    , @NamedQuery(name = "Cliente.findByCodCliente", query = "SELECT c FROM Cliente c WHERE c.codCliente = :codCliente")
-    , @NamedQuery(name = "Cliente.findByNombreCliente", query = "SELECT c FROM Cliente c WHERE c.nombreCliente = :nombreCliente")
-    , @NamedQuery(name = "Cliente.findByApellidosCliente", query = "SELECT c FROM Cliente c WHERE c.apellidosCliente = :apellidosCliente")
-    , @NamedQuery(name = "Cliente.findByDireccionCliente", query = "SELECT c FROM Cliente c WHERE c.direccionCliente = :direccionCliente")
-    , @NamedQuery(name = "Cliente.findByTelefonoCliente", query = "SELECT c FROM Cliente c WHERE c.telefonoCliente = :telefonoCliente")
-    , @NamedQuery(name = "Cliente.findByTipoCliente", query = "SELECT c FROM Cliente c WHERE c.tipoCliente = :tipoCliente")
-    , @NamedQuery(name = "Cliente.findByFechanacCliente", query = "SELECT c FROM Cliente c WHERE c.fechanacCliente = :fechanacCliente")
-    , @NamedQuery(name = "Cliente.findByObservacionesCliente", query = "SELECT c FROM Cliente c WHERE c.observacionesCliente = :observacionesCliente")})
-public class Cliente implements Serializable {
+    @NamedQuery(name = "Cliente.findAll", query = "SELECT c FROM Cliente c"),
+    @NamedQuery(name = "Cliente.findByIdCliente", query = "SELECT c FROM Cliente c WHERE c.idCliente = :idCLiente"),
+    @NamedQuery(name = "Cliente.findByNombreCliente", query = "SELECT c FROM Cliente c WHERE c.nombreCliente = :nombreCliente"),
+    @NamedQuery(name = "Cliente.findByApellidosCliente", query = "SELECT c FROM Cliente c WHERE c.apellidosCliente = :apellidosCliente"),
+    @NamedQuery(name = "Cliente.findByDireccionCliente", query = "SELECT c FROM Cliente c WHERE c.direccionCliente = :direccionCliente"),
+    @NamedQuery(name = "Cliente.findByTelefonoCliente", query = "SELECT c FROM Cliente c WHERE c.telefonoCliente = :telefonoCliente"),
+    @NamedQuery(name = "Cliente.findByTipoCliente", query = "SELECT c FROM Cliente c WHERE c.tipoCliente = :tipoCliente"),
+    @NamedQuery(name = "Cliente.findByFechanacCliente", query = "SELECT c FROM Cliente c WHERE c.fechanacCliente = :fechanacCliente"),
+    @NamedQuery(name = "Cliente.findByObservacionesCliente", query = "SELECT c FROM Cliente c WHERE c.observacionesCliente = :observacionesCliente")})
+public class Cliente implements Serializable, Comparable<Cliente> {
+
+    @Size(max = 30)
+    @Column(name = "alias_cliente")
+    private String aliasCliente;
+    @Size(max = 100)
+    @Column(name = "municipio_cliente")
+    private String municipioCliente;
+    @Size(max = 100)
+    @Column(name = "privincia_cliente")
+    private String privinciaCliente;
 
     private static final long serialVersionUID = 1L;
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 6)
-    @Column(name = "cod_cliente")
-    private String codCliente;
+    @Column(name = "id_cliente")
+    private Integer idCliente;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 30)
     @Column(name = "nombre_cliente")
     private String nombreCliente;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 30)
     @Column(name = "apellidos_cliente")
     private String apellidosCliente;
-    @Size(max = 100)
     @Column(name = "direccion_cliente")
     private String direccionCliente;
     @Column(name = "telefono_cliente")
-    private Integer telefonoCliente;
-    @Size(max = 40)
+    private String telefonoCliente;
     @Column(name = "tipo_cliente")
     private String tipoCliente;
     @Column(name = "fechanac_cliente")
     @Temporal(TemporalType.DATE)
     private Date fechanacCliente;
-    @Size(max = 255)
     @Column(name = "observaciones_cliente")
     private String observacionesCliente;
-    @OneToMany(mappedBy = "clientecodCliente")
+    @OneToMany(mappedBy = "clienteIdCliente")
     private List<Orden> ordenList;
 
     public Cliente() {
-    }
-
-    public Cliente(String codCliente) {
-        this.codCliente = codCliente;
-    }
-
-    public Cliente(String codCliente, String nombreCliente, String apellidosCliente) {
-        this.codCliente = codCliente;
-        this.nombreCliente = nombreCliente;
-        this.apellidosCliente = apellidosCliente;
-    }
-
-    public String getCodCliente() {
-        return codCliente;
-    }
-
-    public void setCodCliente(String codCliente) {
-        this.codCliente = codCliente;
     }
 
     public String getNombreCliente() {
@@ -123,11 +108,11 @@ public class Cliente implements Serializable {
         this.direccionCliente = direccionCliente;
     }
 
-    public Integer getTelefonoCliente() {
+    public String getTelefonoCliente() {
         return telefonoCliente;
     }
 
-    public void setTelefonoCliente(Integer telefonoCliente) {
+    public void setTelefonoCliente(String telefonoCliente) {
         this.telefonoCliente = telefonoCliente;
     }
 
@@ -155,7 +140,6 @@ public class Cliente implements Serializable {
         this.observacionesCliente = observacionesCliente;
     }
 
-    @XmlTransient
     public List<Orden> getOrdenList() {
         return ordenList;
     }
@@ -164,10 +148,46 @@ public class Cliente implements Serializable {
         this.ordenList = ordenList;
     }
 
+    public Cliente(Integer idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public Integer getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(Integer idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public String getAliasCliente() {
+        return aliasCliente;
+    }
+
+    public void setAliasCliente(String aliasCliente) {
+        this.aliasCliente = aliasCliente;
+    }
+
+    public String getMunicipioCliente() {
+        return municipioCliente;
+    }
+
+    public void setMunicipioCliente(String municipioCliente) {
+        this.municipioCliente = municipioCliente;
+    }
+
+    public String getPrivinciaCliente() {
+        return privinciaCliente;
+    }
+
+    public void setPrivinciaCliente(String privinciaCliente) {
+        this.privinciaCliente = privinciaCliente;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (codCliente != null ? codCliente.hashCode() : 0);
+        hash += (idCliente != null ? idCliente.hashCode() : 0);
         return hash;
     }
 
@@ -178,7 +198,7 @@ public class Cliente implements Serializable {
             return false;
         }
         Cliente other = (Cliente) object;
-        if ((this.codCliente == null && other.codCliente != null) || (this.codCliente != null && !this.codCliente.equals(other.codCliente))) {
+        if ((this.idCliente == null && other.idCliente != null) || (this.idCliente != null && !this.idCliente.equals(other.idCliente))) {
             return false;
         }
         return true;
@@ -186,7 +206,12 @@ public class Cliente implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Cliente[ codCliente=" + codCliente + " ]";
+        return nombreCliente;
+    }
+
+    @Override
+    public int compareTo(Cliente o) {
+        return this.nombreCliente.compareTo(o.getNombreCliente());
     }
 
 }

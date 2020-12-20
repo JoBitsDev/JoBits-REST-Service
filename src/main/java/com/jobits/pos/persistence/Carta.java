@@ -3,12 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -19,47 +23,50 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "codCarta", scope = Carta.class)
 @Entity
 @Table(name = "carta")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Carta.findAll", query = "SELECT c FROM Carta c")
-    , @NamedQuery(name = "Carta.findByCodCarta", query = "SELECT c FROM Carta c WHERE c.codCarta = :codCarta")
-    , @NamedQuery(name = "Carta.findByNombreCarta", query = "SELECT c FROM Carta c WHERE c.nombreCarta = :nombreCarta")
-    , @NamedQuery(name = "Carta.findByMonedaPrincipal", query = "SELECT c FROM Carta c WHERE c.monedaPrincipal = :monedaPrincipal")})
+    @NamedQuery(name = "Carta.findAll", query = "SELECT c FROM Carta c"),
+    @NamedQuery(name = "Carta.findByCodCarta", query = "SELECT c FROM Carta c WHERE c.codCarta = :codCarta"),
+    @NamedQuery(name = "Carta.findByNombreCarta", query = "SELECT c FROM Carta c WHERE c.nombreCarta = :nombreCarta"),
+    @NamedQuery(name = "Carta.findByMonedaPrincipal", query = "SELECT c FROM Carta c WHERE c.monedaPrincipal = :monedaPrincipal")})
 public class Carta implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 7)
-    @Column(name = "cod_carta")
-    private String codCarta;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 30)
-    @Column(name = "nombre_carta")
-    private String nombreCarta;
-    @Size(max = 3)
-    @Column(name = "moneda_principal")
-    private String monedaPrincipal;
+
+    @Column(name = "disponible_desde")
+    @Temporal(TemporalType.TIME)
+    private Date disponibleDesde;
+    @Column(name = "disponible_hasta")
+    @Temporal(TemporalType.TIME)
+    private Date disponibleHasta;
     @JoinTable(name = "carta_area", joinColumns = {
         @JoinColumn(name = "cartacod_carta", referencedColumnName = "cod_carta")}, inverseJoinColumns = {
         @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")})
     @ManyToMany
     private List<Area> areaList;
-    @OneToMany(mappedBy = "cartacodCarta")
+
+    @Id
+    @Basic(optional = false)
+    @Column(name = "cod_carta")
+    private String codCarta;
+    @Basic(optional = false)
+    @Column(name = "nombre_carta")
+    private String nombreCarta;
+    @Column(name = "moneda_principal")
+    private String monedaPrincipal;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cartacodCarta")
     private List<Seccion> seccionList;
 
     public Carta() {
@@ -98,7 +105,6 @@ public class Carta implements Serializable {
         this.monedaPrincipal = monedaPrincipal;
     }
 
-    @XmlTransient
     public List<Area> getAreaList() {
         return areaList;
     }
@@ -107,7 +113,6 @@ public class Carta implements Serializable {
         this.areaList = areaList;
     }
 
-    @XmlTransient
     public List<Seccion> getSeccionList() {
         return seccionList;
     }
@@ -138,7 +143,22 @@ public class Carta implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Carta[ codCarta=" + codCarta + " ]";
+        return "(" + getMonedaPrincipal() + ")-" + getNombreCarta() + "[" + getCodCarta() + "]";
     }
 
+    public Date getDisponibleDesde() {
+        return disponibleDesde;
+    }
+
+    public void setDisponibleDesde(Date disponibleDesde) {
+        this.disponibleDesde = disponibleDesde;
+    }
+
+    public Date getDisponibleHasta() {
+        return disponibleHasta;
+    }
+
+    public void setDisponibleHasta(Date disponibleHasta) {
+        this.disponibleHasta = disponibleHasta;
+    }
 }

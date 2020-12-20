@@ -3,10 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -15,43 +20,38 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
- *
  * @author Jorge
- *
+ * 
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class ,property = "insumoElaboradoPK",scope = InsumoElaborado.class)
 @Entity
 @Table(name = "insumo_elaborado")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "InsumoElaborado.findAll", query = "SELECT i FROM InsumoElaborado i")
-    , @NamedQuery(name = "InsumoElaborado.findByInsumocodNombre", query = "SELECT i FROM InsumoElaborado i WHERE i.insumoElaboradoPK.insumocodNombre = :insumocodNombre")
-    , @NamedQuery(name = "InsumoElaborado.findByInsumocodInsumo", query = "SELECT i FROM InsumoElaborado i WHERE i.insumoElaboradoPK.insumocodInsumo = :insumocodInsumo")
-    , @NamedQuery(name = "InsumoElaborado.findByCantidad", query = "SELECT i FROM InsumoElaborado i WHERE i.cantidad = :cantidad")
-    , @NamedQuery(name = "InsumoElaborado.findByCosto", query = "SELECT i FROM InsumoElaborado i WHERE i.costo = :costo")})
+    @NamedQuery(name = "InsumoElaborado.findAll", query = "SELECT i FROM InsumoElaborado i"),
+    @NamedQuery(name = "InsumoElaborado.findByInsumocodNombre", query = "SELECT i FROM InsumoElaborado i WHERE i.insumoElaboradoPK.insumocodNombre = :insumocodNombre"),
+    @NamedQuery(name = "InsumoElaborado.findByInsumocodInsumo", query = "SELECT i FROM InsumoElaborado i WHERE i.insumoElaboradoPK.insumocodInsumo = :insumocodInsumo"),
+    @NamedQuery(name = "InsumoElaborado.findByCantidad", query = "SELECT i FROM InsumoElaborado i WHERE i.cantidad = :cantidad"),
+    @NamedQuery(name = "InsumoElaborado.findByCosto", query = "SELECT i FROM InsumoElaborado i WHERE i.costo = :costo")})
 public class InsumoElaborado implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected InsumoElaboradoPK insumoElaboradoPK;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "cantidad")
     private float cantidad;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "costo")
     private float costo;
     @JoinColumn(name = "insumocod_nombre", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Insumo derivante;
+    private Insumo insumo;
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Insumo insumo;
+    private Insumo insumo_derivado_nombre;
 
     public InsumoElaborado() {
     }
@@ -94,20 +94,20 @@ public class InsumoElaborado implements Serializable {
         this.costo = costo;
     }
 
-    public Insumo getDerivante() {
-        return derivante;
-    }
-
-    public void setDerivante(Insumo derivante) {
-        this.derivante = derivante;
-    }
-
     public Insumo getInsumo() {
         return insumo;
     }
 
     public void setInsumo(Insumo insumo) {
         this.insumo = insumo;
+    }
+
+    public Insumo getInsumo_derivado_nombre() {
+        return insumo_derivado_nombre;
+    }
+
+    public void setInsumo_derivado_nombre(Insumo insumo_derivado_nombre) {
+        this.insumo_derivado_nombre = insumo_derivado_nombre;
     }
 
     @Override
@@ -120,16 +120,19 @@ public class InsumoElaborado implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Insumo)) {
+        if (!(object instanceof InsumoElaborado)) {
             return false;
         }
-        Insumo other = (Insumo) object;
-        return getInsumo().equals(other);
+        InsumoElaborado other = (InsumoElaborado) object;
+        if ((this.insumoElaboradoPK == null && other.insumoElaboradoPK != null) || (this.insumoElaboradoPK != null && !this.insumoElaboradoPK.equals(other.insumoElaboradoPK))) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public String toString() {
-        return "com.restmanager.InsumoElaborado[ insumoElaboradoPK=" + insumoElaboradoPK + " ]";
+        return "restManager.persistencia.InsumoElaborado[ insumoElaboradoPK=" + insumoElaboradoPK + " ]";
     }
 
 }

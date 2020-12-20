@@ -5,9 +5,11 @@
  */
 package com.jobits.pos.persistence;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -20,10 +22,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
@@ -31,31 +29,28 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Jorge
  *
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "codMesa", scope = Mesa.class)
 @Entity
 @Table(name = "mesa")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Mesa.findAll", query = "SELECT m FROM Mesa m")
-    , @NamedQuery(name = "Mesa.findByCodMesa", query = "SELECT m FROM Mesa m WHERE m.codMesa = :codMesa")
-    , @NamedQuery(name = "Mesa.findByEstado", query = "SELECT m FROM Mesa m WHERE m.estado = :estado")
-    , @NamedQuery(name = "Mesa.findByEstallena", query = "SELECT m FROM Mesa m WHERE m.estallena = :estallena")
-    , @NamedQuery(name = "Mesa.findByCapacidadMax", query = "SELECT m FROM Mesa m WHERE m.capacidadMax = :capacidadMax")
-    , @NamedQuery(name = "Mesa.findByUbicacion", query = "SELECT m FROM Mesa m WHERE m.ubicacion = :ubicacion")})
+    @NamedQuery(name = "Mesa.findAll", query = "SELECT m FROM Mesa m ORDER BY m.codMesa ASC"),
+    @NamedQuery(name = "Mesa.findFromArea", query = "SELECT m FROM Mesa m where m.areacodArea.codArea = :areaCod"),
+    @NamedQuery(name = "Mesa.findByCodMesa", query = "SELECT m FROM Mesa m WHERE m.codMesa = :codMesa"),
+    @NamedQuery(name = "Mesa.findByEstado", query = "SELECT m FROM Mesa m WHERE m.estado = :estado"),
+    @NamedQuery(name = "Mesa.findByEstallena", query = "SELECT m FROM Mesa m WHERE m.estallena = :estallena"),
+    @NamedQuery(name = "Mesa.findByCapacidadMax", query = "SELECT m FROM Mesa m WHERE m.capacidadMax = :capacidadMax"),
+    @NamedQuery(name = "Mesa.findByUbicacion", query = "SELECT m FROM Mesa m WHERE m.ubicacion = :ubicacion")})
 public class Mesa implements Serializable, Comparable<Mesa> {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
     @Column(name = "cod_mesa")
     private String codMesa;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 60)
     @Column(name = "estado")
     private String estado;
+    public static final String PROP_ESTADO = "estado";
     @Column(name = "estallena")
     private Boolean estallena;
     @Column(name = "capacidad_max")
@@ -63,11 +58,10 @@ public class Mesa implements Serializable, Comparable<Mesa> {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "ubicacion")
     private Double ubicacion;
-    @JsonIgnore
     @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
     @ManyToOne
     private Area areacodArea;
-    @JsonBackReference
+    @JsonIgnore
     @OneToMany(mappedBy = "mesacodMesa")
     private List<Orden> ordenList;
 
@@ -83,6 +77,13 @@ public class Mesa implements Serializable, Comparable<Mesa> {
         this.estado = estado;
     }
 
+    @Override
+    public int compareTo(Mesa o) {
+        String[] a = codMesa.split("-");
+        String[] b = o.getCodMesa().split("-");
+        return a[1].compareTo(b[1]);
+    }
+
     public String getCodMesa() {
         return codMesa;
     }
@@ -96,7 +97,9 @@ public class Mesa implements Serializable, Comparable<Mesa> {
     }
 
     public void setEstado(String estado) {
+        String oldEstado = this.estado;
         this.estado = estado;
+        propertyChangeSupport.firePropertyChange(PROP_ESTADO, oldEstado, estado);
     }
 
     public Boolean getEstallena() {
@@ -131,7 +134,6 @@ public class Mesa implements Serializable, Comparable<Mesa> {
         this.areacodArea = areacodArea;
     }
 
-    @XmlTransient
     public List<Orden> getOrdenList() {
         return ordenList;
     }
@@ -162,11 +164,31 @@ public class Mesa implements Serializable, Comparable<Mesa> {
 
     @Override
     public String toString() {
-        return "com.restmanager.Mesa[ codMesa=" + codMesa + " ]";
+        return "Mesa: " + codMesa + " [ " + capacidadMax + " pax ]";
     }
 
-    @Override
-    public int compareTo(Mesa o) {
-        return codMesa.length() > o.codMesa.length() ? 1: codMesa.compareToIgnoreCase(o.codMesa);
+    public boolean isVacia() {
+        return getEstado().equals("vacia");
     }
+
+    private transient final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    /**
+     * Add PropertyChangeListener.
+     *
+     * @param listener
+     */
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * Remove PropertyChangeListener.
+     *
+     * @param listener
+     */
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
 }

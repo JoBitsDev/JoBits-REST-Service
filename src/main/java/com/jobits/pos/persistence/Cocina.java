@@ -6,6 +6,7 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -13,14 +14,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
@@ -29,41 +27,40 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @Entity
 @Table(name = "cocina")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Cocina.findAll", query = "SELECT c FROM Cocina c")
-    , @NamedQuery(name = "Cocina.findByCodCocina", query = "SELECT c FROM Cocina c WHERE c.codCocina = :codCocina")
-    , @NamedQuery(name = "Cocina.findByNombreCocina", query = "SELECT c FROM Cocina c WHERE c.nombreCocina = :nombreCocina")
-    , @NamedQuery(name = "Cocina.findByLimitarVentaInsumoAgotado", query = "SELECT c FROM Cocina c WHERE c.limitarVentaInsumoAgotado = :limitarVentaInsumoAgotado")
-    , @NamedQuery(name = "Cocina.findByRecibirNotificacion", query = "SELECT c FROM Cocina c WHERE c.recibirNotificacion = :recibirNotificacion")})
-public class Cocina implements Serializable {
+    @NamedQuery(name = "Cocina.findAll", query = "SELECT c FROM Cocina c"),
+    @NamedQuery(name = "Cocina.findByCodCocina", query = "SELECT c FROM Cocina c WHERE c.codCocina = :codCocina"),
+    @NamedQuery(name = "Cocina.findByNombreCocina", query = "SELECT c FROM Cocina c WHERE c.nombreCocina = :nombreCocina")})
+public class Cocina implements Serializable, Comparable<Cocina> {
+
+    @Column(name = "limitar_venta_insumo_agotado")
+    private Boolean limitarVentaInsumoAgotado = false;
+    @Column(name = "recibir_notificacion")
+    private Boolean recibirNotificacion = true;
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 5)
     @Column(name = "cod_cocina")
     private String codCocina;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 30)
     @Column(name = "nombre_cocina")
     private String nombreCocina;
-    @Column(name = "limitar_venta_insumo_agotado")
-    private Boolean limitarVentaInsumoAgotado;
-    @Column(name = "recibir_notificacion")
-    private Boolean recibirNotificacion;
+    @JsonIgnore
     @OneToMany(mappedBy = "cocinacodCocina")
     private List<ProductoVenta> productoVentaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocinacodCocina")
-    private List<TransaccionSalida> transaccionSalidaList;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocina")
     private List<NotificacionEnvioCocina> notificacionEnvioCocinaList;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocina")
     private List<Ipv> ipvList;
-    @OneToMany(mappedBy = "cocinacodCocina")
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocinacodCocina")
     private List<Impresora> impresoraList;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cocinacodCocina")
+    private List<TransaccionSalida> transaccionSalidaList;
 
     public Cocina() {
     }
@@ -93,23 +90,6 @@ public class Cocina implements Serializable {
         this.nombreCocina = nombreCocina;
     }
 
-    public Boolean getLimitarVentaInsumoAgotado() {
-        return limitarVentaInsumoAgotado;
-    }
-
-    public void setLimitarVentaInsumoAgotado(Boolean limitarVentaInsumoAgotado) {
-        this.limitarVentaInsumoAgotado = limitarVentaInsumoAgotado;
-    }
-
-    public Boolean getRecibirNotificacion() {
-        return recibirNotificacion;
-    }
-
-    public void setRecibirNotificacion(Boolean recibirNotificacion) {
-        this.recibirNotificacion = recibirNotificacion;
-    }
-
-    @XmlTransient
     public List<ProductoVenta> getProductoVentaList() {
         return productoVentaList;
     }
@@ -118,16 +98,6 @@ public class Cocina implements Serializable {
         this.productoVentaList = productoVentaList;
     }
 
-    @XmlTransient
-    public List<TransaccionSalida> getTransaccionSalidaList() {
-        return transaccionSalidaList;
-    }
-
-    public void setTransaccionSalidaList(List<TransaccionSalida> transaccionSalidaList) {
-        this.transaccionSalidaList = transaccionSalidaList;
-    }
-
-    @XmlTransient
     public List<NotificacionEnvioCocina> getNotificacionEnvioCocinaList() {
         return notificacionEnvioCocinaList;
     }
@@ -136,7 +106,6 @@ public class Cocina implements Serializable {
         this.notificacionEnvioCocinaList = notificacionEnvioCocinaList;
     }
 
-    @XmlTransient
     public List<Ipv> getIpvList() {
         return ipvList;
     }
@@ -145,7 +114,6 @@ public class Cocina implements Serializable {
         this.ipvList = ipvList;
     }
 
-    @XmlTransient
     public List<Impresora> getImpresoraList() {
         return impresoraList;
     }
@@ -176,7 +144,36 @@ public class Cocina implements Serializable {
 
     @Override
     public String toString() {
-        return  nombreCocina + "("+codCocina+")";
+        return nombreCocina+" ("+codCocina+")";
+    }
+
+    public Boolean getLimitarVentaInsumoAgotado() {
+        return limitarVentaInsumoAgotado;
+    }
+
+    public void setLimitarVentaInsumoAgotado(Boolean limitarVentaInsumoAgotado) {
+        this.limitarVentaInsumoAgotado = limitarVentaInsumoAgotado;
+    }
+
+    public Boolean getRecibirNotificacion() {
+        return recibirNotificacion;
+    }
+
+    public void setRecibirNotificacion(Boolean recibirNotificacion) {
+        this.recibirNotificacion = recibirNotificacion;
+    }
+
+    public List<TransaccionSalida> getTransaccionSalidaList() {
+        return transaccionSalidaList;
+    }
+
+    public void setTransaccionSalidaList(List<TransaccionSalida> transaccionSalidaList) {
+        this.transaccionSalidaList = transaccionSalidaList;
+    }
+
+    @Override
+    public int compareTo(Cocina o) {
+        return this.nombreCocina.compareTo(o.getNombreCocina());
     }
 
 }

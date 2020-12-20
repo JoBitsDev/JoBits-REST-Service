@@ -6,29 +6,25 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * FirstDream
  * @author Jorge
  * 
  */
+@JsonRootName(value = "insumoElaboradoPK")
 @Embeddable
 public class InsumoElaboradoPK implements Serializable {
 
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 6)
     @Column(name = "insumocod_nombre")
     private String insumocodNombre;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 6)
     @Column(name = "insumocod_insumo")
     private String insumocodInsumo;
 
@@ -82,7 +78,7 @@ public class InsumoElaboradoPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.InsumoElaboradoPK[ insumocodNombre=" + insumocodNombre + ", insumocodInsumo=" + insumocodInsumo + " ]";
+        return "restManager.persistencia.InsumoElaboradoPK[ insumocodNombre=" + insumocodNombre + ", insumocodInsumo=" + insumocodInsumo + " ]";
     }
 
 }

@@ -6,6 +6,11 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -22,35 +27,28 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
  * @author Jorge
  * 
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property = "codGasto",scope = Gasto.class )
 @Entity
 @Table(name = "gasto")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Gasto.findAll", query = "SELECT g FROM Gasto g")
-    , @NamedQuery(name = "Gasto.findByCodGasto", query = "SELECT g FROM Gasto g WHERE g.codGasto = :codGasto")
-    , @NamedQuery(name = "Gasto.findByNombre", query = "SELECT g FROM Gasto g WHERE g.nombre = :nombre")
-    , @NamedQuery(name = "Gasto.findByFrecuenciaPago", query = "SELECT g FROM Gasto g WHERE g.frecuenciaPago = :frecuenciaPago")
-    , @NamedQuery(name = "Gasto.findByUltimoPago", query = "SELECT g FROM Gasto g WHERE g.ultimoPago = :ultimoPago")})
+    @NamedQuery(name = "Gasto.findAll", query = "SELECT g FROM Gasto g"),
+    @NamedQuery(name = "Gasto.findByCodGasto", query = "SELECT g FROM Gasto g WHERE g.codGasto = :codGasto"),
+    @NamedQuery(name = "Gasto.findByNombre", query = "SELECT g.nombre FROM Gasto g WHERE g.tipoGastoidGasto.idGasto = :id"),
+    @NamedQuery(name = "Gasto.findByFrecuenciaPago", query = "SELECT g FROM Gasto g WHERE g.frecuenciaPago = :frecuenciaPago"),
+    @NamedQuery(name = "Gasto.findByUltimoPago", query = "SELECT g FROM Gasto g WHERE g.ultimoPago = :ultimoPago")})
 public class Gasto implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
     @Column(name = "cod_gasto")
     private String codGasto;
-    @Size(max = 100)
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "frecuencia_pago")
@@ -61,6 +59,7 @@ public class Gasto implements Serializable {
     @JoinColumn(name = "tipo_gastoid_gasto", referencedColumnName = "id_gasto")
     @ManyToOne(optional = false)
     private TipoGasto tipoGastoidGasto;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gasto")
     private List<GastoVenta> gastoVentaList;
 
@@ -111,7 +110,6 @@ public class Gasto implements Serializable {
         this.tipoGastoidGasto = tipoGastoidGasto;
     }
 
-    @XmlTransient
     public List<GastoVenta> getGastoVentaList() {
         return gastoVentaList;
     }
@@ -142,7 +140,7 @@ public class Gasto implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Gasto[ codGasto=" + codGasto + " ]";
+        return "restManager.persistencia.Gasto[ codGasto=" + codGasto + " ]";
     }
 
 }

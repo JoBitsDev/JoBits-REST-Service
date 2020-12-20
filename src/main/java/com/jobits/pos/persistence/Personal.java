@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +18,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -25,43 +26,39 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "usuario", scope = Personal.class)
 @Entity
 @Table(name = "personal")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Personal.findAll", query = "SELECT p FROM Personal p")
-    , @NamedQuery(name = "Personal.findByUsuario", query = "SELECT p FROM Personal p WHERE p.usuario = :usuario")
-    , @NamedQuery(name = "Personal.findByContrasenna", query = "SELECT p FROM Personal p WHERE p.contrasenna = :contrasenna")
-    , @NamedQuery(name = "Personal.findByOnline", query = "SELECT p FROM Personal p WHERE p.online = :online")
-    , @NamedQuery(name = "Personal.findByFrecuencia", query = "SELECT p FROM Personal p WHERE p.frecuencia = :frecuencia")
-    , @NamedQuery(name = "Personal.findByUltimodiaPago", query = "SELECT p FROM Personal p WHERE p.ultimodiaPago = :ultimodiaPago")
-    , @NamedQuery(name = "Personal.findByPagoPendiente", query = "SELECT p FROM Personal p WHERE p.pagoPendiente = :pagoPendiente")})
-public class Personal implements Serializable {
+    @NamedQuery(name = "Personal.findAll", query = "SELECT p FROM Personal p"),
+    @NamedQuery(name = "Personal.findByUsuario", query = "SELECT p FROM Personal p WHERE p.usuario = :usuario"),
+    @NamedQuery(name = "Personal.findByContrasenna", query = "SELECT p FROM Personal p WHERE p.contrasenna = :contrasenna"),
+    @NamedQuery(name = "Personal.findByOnline", query = "SELECT p FROM Personal p WHERE p.online = :online"),
+    @NamedQuery(name = "Personal.findByFrecuencia", query = "SELECT p FROM Personal p WHERE p.frecuencia = :frecuencia"),})
+public class Personal implements Serializable, Comparable<Personal> {
 
     @Lob
     @Column(name = "foto")
     private byte[] foto;
+    @Column(name = "pago_pendiente")
+    private Float pagoPendiente;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "personal")
+    private List<AsistenciaPersonal> asistenciaPersonalList;
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
     @Column(name = "usuario")
     private String usuario;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
     @Column(name = "contrasenna")
     private String contrasenna;
     @Column(name = "online")
@@ -71,17 +68,11 @@ public class Personal implements Serializable {
     @Column(name = "ultimodia_pago")
     @Temporal(TemporalType.DATE)
     private Date ultimodiaPago;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "pago_pendiente")
-    private Float pagoPendiente;
-    @ManyToMany(mappedBy = "personalList")
-    private List<PuestoTrabajo> puestoTrabajoList;
-    @OneToMany(mappedBy = "personalusuario")
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "personalusuario")
     private List<Orden> ordenList;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "personal")
     private DatosPersonales datosPersonales;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "personal")
-    private List<AsistenciaPersonal> asistenciaPersonalList;
     @JoinColumn(name = "puesto_trabajonombre_puesto", referencedColumnName = "nombre_puesto")
     @ManyToOne(optional = false)
     private PuestoTrabajo puestoTrabajonombrePuesto;
@@ -138,25 +129,6 @@ public class Personal implements Serializable {
         this.ultimodiaPago = ultimodiaPago;
     }
 
-
-    public Float getPagoPendiente() {
-        return pagoPendiente;
-    }
-
-    public void setPagoPendiente(Float pagoPendiente) {
-        this.pagoPendiente = pagoPendiente;
-    }
-
-    @XmlTransient
-    public List<PuestoTrabajo> getPuestoTrabajoList() {
-        return puestoTrabajoList;
-    }
-
-    public void setPuestoTrabajoList(List<PuestoTrabajo> puestoTrabajoList) {
-        this.puestoTrabajoList = puestoTrabajoList;
-    }
-
-    @XmlTransient
     public List<Orden> getOrdenList() {
         return ordenList;
     }
@@ -171,15 +143,6 @@ public class Personal implements Serializable {
 
     public void setDatosPersonales(DatosPersonales datosPersonales) {
         this.datosPersonales = datosPersonales;
-    }
-
-    @XmlTransient
-    public List<AsistenciaPersonal> getAsistenciaPersonalList() {
-        return asistenciaPersonalList;
-    }
-
-    public void setAsistenciaPersonalList(List<AsistenciaPersonal> asistenciaPersonalList) {
-        this.asistenciaPersonalList = asistenciaPersonalList;
     }
 
     public PuestoTrabajo getPuestoTrabajonombrePuesto() {
@@ -212,7 +175,23 @@ public class Personal implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Personal[ usuario=" + usuario + " ]";
+        return usuario;
+    }
+
+    public List<AsistenciaPersonal> getAsistenciaPersonalList() {
+        return asistenciaPersonalList;
+    }
+
+    public void setAsistenciaPersonalList(List<AsistenciaPersonal> asistenciaPersonalList) {
+        this.asistenciaPersonalList = asistenciaPersonalList;
+    }
+
+    public Float getPagoPendiente() {
+        return pagoPendiente;
+    }
+
+    public void setPagoPendiente(Float pagoPendiente) {
+        this.pagoPendiente = pagoPendiente;
     }
 
     public byte[] getFoto() {
@@ -221,6 +200,11 @@ public class Personal implements Serializable {
 
     public void setFoto(byte[] foto) {
         this.foto = foto;
+    }
+
+    @Override
+    public int compareTo(Personal o) {
+        return this.usuario.compareTo(o.getUsuario());
     }
 
 }

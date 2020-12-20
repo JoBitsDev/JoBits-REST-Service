@@ -850,7 +850,7 @@ public class Impresion {
         t.addLineSeperator();
         t.newLine();
         t.alignRight();
-        t.setText(FECHA + R.DATE_FORMAT.format(o.getVentafecha().getFecha()) + R.TIME_FORMAT.format(date));
+        t.setText(FECHA + R.DATE_FORMAT.format(o.getVentafecha()) + R.TIME_FORMAT.format(date));
         t.newLine();
         t.setText(ORDEN + o.getCodOrden());
         t.newLine();
@@ -867,7 +867,7 @@ public class Impresion {
 
     }
 
-   private float addPvOrden(Ticket t, List<ProductovOrden> prods) {
+    private float addPvOrden(Ticket t, List<ProductovOrden> prods) {
         float total = 0;
         for (ProductovOrden x : prods) {
             t.alignLeft();
@@ -953,7 +953,7 @@ public class Impresion {
         ret += fillSpace(x.getEntrada(), LenghtPerSeparator) + separador;
         ret += fillSpace(x.getDisponible(), LenghtPerSeparator) + separador;
         ret += fillSpace(x.getConsumo(), LenghtPerSeparator) + separador;
-        ret += fillSpace(x.getFinal1(), LenghtPerSeparator);
+        ret += fillSpace(x.getFinalCalculado(), LenghtPerSeparator);
 
         return ret;
     }

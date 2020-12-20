@@ -6,7 +6,6 @@
 
 package com.jobits.pos.persistence;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -17,9 +16,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -28,25 +24,21 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "transaccion_merma")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "TransaccionMerma.findAll", query = "SELECT t FROM TransaccionMerma t")
-    , @NamedQuery(name = "TransaccionMerma.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionMerma t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion")
-    , @NamedQuery(name = "TransaccionMerma.findByRazon", query = "SELECT t FROM TransaccionMerma t WHERE t.razon = :razon")})
+    @NamedQuery(name = "TransaccionMerma.findAll", query = "SELECT t FROM TransaccionMerma t"),
+    @NamedQuery(name = "TransaccionMerma.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionMerma t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion"),
+    @NamedQuery(name = "TransaccionMerma.findByRazon", query = "SELECT t FROM TransaccionMerma t WHERE t.razon = :razon")})
 public class TransaccionMerma implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
     @Column(name = "transaccionno_transaccion")
     private Integer transaccionnoTransaccion;
-    @Size(max = 255)
     @Column(name = "razon")
     private String razon;
     @JoinColumn(name = "transaccionno_transaccion", referencedColumnName = "no_transaccion", insertable = false, updatable = false)
     @OneToOne(optional = false)
-    @JsonBackReference
     private Transaccion transaccion;
 
     public TransaccionMerma() {
@@ -102,7 +94,7 @@ public class TransaccionMerma implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.TransaccionMerma[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
+        return "restManager.persistencia.TransaccionMerma[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
     }
 
 }

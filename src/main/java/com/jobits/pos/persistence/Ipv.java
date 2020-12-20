@@ -6,6 +6,8 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -17,21 +19,19 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
  * @author Jorge
  * 
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property =  "ipvPK",scope = Ipv.class)
 @Entity
 @Table(name = "ipv")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Ipv.findAll", query = "SELECT i FROM Ipv i")
-    , @NamedQuery(name = "Ipv.findByInsumocodInsumo", query = "SELECT i FROM Ipv i WHERE i.ipvPK.insumocodInsumo = :insumocodInsumo")
-    , @NamedQuery(name = "Ipv.findByCocinacodCocina", query = "SELECT i FROM Ipv i WHERE i.ipvPK.cocinacodCocina = :cocinacodCocina")})
+    @NamedQuery(name = "Ipv.findAll", query = "SELECT i FROM Ipv i"),
+    @NamedQuery(name = "Ipv.findByInsumocodInsumo", query = "SELECT i FROM Ipv i WHERE i.ipvPK.insumocodInsumo = :insumocodInsumo"),
+    @NamedQuery(name = "Ipv.findByCocinacodCocina", query = "SELECT i FROM Ipv i WHERE i.ipvPK.cocinacodCocina = :cocinacodCocina")})
 public class Ipv implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -65,7 +65,6 @@ public class Ipv implements Serializable {
         this.ipvPK = ipvPK;
     }
 
-    @XmlTransient
     public List<IpvRegistro> getIpvRegistroList() {
         return ipvRegistroList;
     }
@@ -112,7 +111,7 @@ public class Ipv implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Ipv[ ipvPK=" + ipvPK + " ]";
+        return "restManager.persistencia.Ipv[ ipvPK=" + ipvPK + " ]";
     }
 
 }

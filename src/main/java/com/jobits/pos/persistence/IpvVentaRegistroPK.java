@@ -7,17 +7,15 @@
 package com.jobits.pos.persistence;
 
 import java.io.Serializable;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- * FirstDream
+ * 
+ * JoBits
  * @author Jorge
  * 
  */
@@ -26,29 +24,20 @@ public class IpvVentaRegistroPK implements Serializable {
 
     @Basic(optional = false)
     @NotNull
-    @Column(name = "ventafecha")
-    @Temporal(TemporalType.DATE)
-    private Date ventafecha;
-    @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 7)
     @Column(name = "producto_ventap_cod")
     private String productoVentapCod;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "ventaid")
+    private int ventaid;
 
     public IpvVentaRegistroPK() {
     }
 
-    public IpvVentaRegistroPK(Date ventafecha, String productoVentapCod) {
-        this.ventafecha = ventafecha;
+    public IpvVentaRegistroPK(String productoVentapCod, int ventaid) {
         this.productoVentapCod = productoVentapCod;
-    }
-
-    public Date getVentafecha() {
-        return ventafecha;
-    }
-
-    public void setVentafecha(Date ventafecha) {
-        this.ventafecha = ventafecha;
+        this.ventaid = ventaid;
     }
 
     public String getProductoVentapCod() {
@@ -59,11 +48,19 @@ public class IpvVentaRegistroPK implements Serializable {
         this.productoVentapCod = productoVentapCod;
     }
 
+    public int getVentaid() {
+        return ventaid;
+    }
+
+    public void setVentaid(int ventaid) {
+        this.ventaid = ventaid;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (ventafecha != null ? ventafecha.hashCode() : 0);
         hash += (productoVentapCod != null ? productoVentapCod.hashCode() : 0);
+        hash += (int) ventaid;
         return hash;
     }
 
@@ -74,10 +71,10 @@ public class IpvVentaRegistroPK implements Serializable {
             return false;
         }
         IpvVentaRegistroPK other = (IpvVentaRegistroPK) object;
-        if ((this.ventafecha == null && other.ventafecha != null) || (this.ventafecha != null && !this.ventafecha.equals(other.ventafecha))) {
+        if ((this.productoVentapCod == null && other.productoVentapCod != null) || (this.productoVentapCod != null && !this.productoVentapCod.equals(other.productoVentapCod))) {
             return false;
         }
-        if ((this.productoVentapCod == null && other.productoVentapCod != null) || (this.productoVentapCod != null && !this.productoVentapCod.equals(other.productoVentapCod))) {
+        if (this.ventaid != other.ventaid) {
             return false;
         }
         return true;
@@ -85,7 +82,7 @@ public class IpvVentaRegistroPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.jobits.pos.persistence.IpvVentaRegistroPK[ ventafecha=" + ventafecha + ", productoVentapCod=" + productoVentapCod + " ]";
+        return "com.jobits.pos.domain.models.IpvVentaRegistroPK[ productoVentapCod=" + productoVentapCod + ", ventaid=" + ventaid + " ]";
     }
 
 }

@@ -6,7 +6,6 @@
 package com.jobits.pos.persistence;
 
 import java.io.Serializable;
-import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -15,29 +14,26 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * FirstDream
- *
+ * 
+ * JoBits
  * @author Jorge
- *
+ * 
  */
 @Entity
 @Table(name = "ipv_venta_registro")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "IpvVentaRegistro.findAll", query = "SELECT i FROM IpvVentaRegistro i")
-    , @NamedQuery(name = "IpvVentaRegistro.findByVentafecha", query = "SELECT i FROM IpvVentaRegistro i WHERE i.ipvVentaRegistroPK.ventafecha = :ventafecha")
-    , @NamedQuery(name = "IpvVentaRegistro.findByProductoVentapCod", query = "SELECT i FROM IpvVentaRegistro i WHERE i.ipvVentaRegistroPK.productoVentapCod = :productoVentapCod")
-    , @NamedQuery(name = "IpvVentaRegistro.findByPtoElab", query = "SELECT i FROM IpvVentaRegistro i WHERE i.productoVenta.cocinacodCocina.codCocina = :ptoElab AND i.venta1.fecha = :fecha")
-    , @NamedQuery(name = "IpvVentaRegistro.findByInicio", query = "SELECT i FROM IpvVentaRegistro i WHERE i.inicio = :inicio")
-    , @NamedQuery(name = "IpvVentaRegistro.findByEntrada", query = "SELECT i FROM IpvVentaRegistro i WHERE i.entrada = :entrada")
-    , @NamedQuery(name = "IpvVentaRegistro.findByDisponible", query = "SELECT i FROM IpvVentaRegistro i WHERE i.disponible = :disponible")
-    , @NamedQuery(name = "IpvVentaRegistro.findByAutorizos", query = "SELECT i FROM IpvVentaRegistro i WHERE i.autorizos = :autorizos")
-    , @NamedQuery(name = "IpvVentaRegistro.findByVenta", query = "SELECT i FROM IpvVentaRegistro i WHERE i.venta = :venta")
-    , @NamedQuery(name = "IpvVentaRegistro.findByPrecioVenta", query = "SELECT i FROM IpvVentaRegistro i WHERE i.precioVenta = :precioVenta")
-    , @NamedQuery(name = "IpvVentaRegistro.findByFinal1", query = "SELECT i FROM IpvVentaRegistro i WHERE i.final1 = :final1")})
+    @NamedQuery(name = "IpvVentaRegistro.findAll", query = "SELECT i FROM IpvVentaRegistro i"),
+    @NamedQuery(name = "IpvVentaRegistro.findByProductoVentapCod", query = "SELECT i FROM IpvVentaRegistro i WHERE i.ipvVentaRegistroPK.productoVentapCod = :productoVentapCod"),
+    @NamedQuery(name = "IpvVentaRegistro.findByInicio", query = "SELECT i FROM IpvVentaRegistro i WHERE i.inicio = :inicio"),
+    @NamedQuery(name = "IpvVentaRegistro.findByEntrada", query = "SELECT i FROM IpvVentaRegistro i WHERE i.entrada = :entrada"),
+    @NamedQuery(name = "IpvVentaRegistro.findByDisponible", query = "SELECT i FROM IpvVentaRegistro i WHERE i.disponible = :disponible"),
+    @NamedQuery(name = "IpvVentaRegistro.findByAutorizos", query = "SELECT i FROM IpvVentaRegistro i WHERE i.autorizos = :autorizos"),
+    @NamedQuery(name = "IpvVentaRegistro.findByVenta", query = "SELECT i FROM IpvVentaRegistro i WHERE i.venta = :venta"),
+    @NamedQuery(name = "IpvVentaRegistro.findByPrecioVenta", query = "SELECT i FROM IpvVentaRegistro i WHERE i.precioVenta = :precioVenta"),
+    @NamedQuery(name = "IpvVentaRegistro.findByFinal1", query = "SELECT i FROM IpvVentaRegistro i WHERE i.final1 = :final1"),
+    @NamedQuery(name = "IpvVentaRegistro.findByVentaid", query = "SELECT i FROM IpvVentaRegistro i WHERE i.ipvVentaRegistroPK.ventaid = :ventaid")})
 public class IpvVentaRegistro implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -61,9 +57,9 @@ public class IpvVentaRegistro implements Serializable {
     @JoinColumn(name = "producto_ventap_cod", referencedColumnName = "p_cod", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private ProductoVenta productoVenta;
-    @JoinColumn(name = "ventafecha", referencedColumnName = "fecha", insertable = false, updatable = false)
+    @JoinColumn(name = "ventaid", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private Venta venta1;
+    private Venta diaVenta;
 
     public IpvVentaRegistro() {
     }
@@ -72,8 +68,8 @@ public class IpvVentaRegistro implements Serializable {
         this.ipvVentaRegistroPK = ipvVentaRegistroPK;
     }
 
-    public IpvVentaRegistro(Date ventafecha, String productoVentapCod) {
-        this.ipvVentaRegistroPK = new IpvVentaRegistroPK(ventafecha, productoVentapCod);
+    public IpvVentaRegistro(String productoVentapCod, int ventaid) {
+        this.ipvVentaRegistroPK = new IpvVentaRegistroPK(productoVentapCod, ventaid);
     }
 
     public IpvVentaRegistroPK getIpvVentaRegistroPK() {
@@ -148,12 +144,12 @@ public class IpvVentaRegistro implements Serializable {
         this.productoVenta = productoVenta;
     }
 
-    public Venta getVenta1() {
-        return venta1;
+    public Venta getDiaVenta() {
+        return diaVenta;
     }
 
-    public void setVenta1(Venta venta1) {
-        this.venta1 = venta1;
+    public void setDiaVenta(Venta diaVenta) {
+        this.diaVenta = diaVenta;
     }
 
     @Override
@@ -178,7 +174,7 @@ public class IpvVentaRegistro implements Serializable {
 
     @Override
     public String toString() {
-        return "com.jobits.pos.persistence.IpvVentaRegistro[ ipvVentaRegistroPK=" + ipvVentaRegistroPK + " ]";
+        return getProductoVenta().toString();
     }
 
 }

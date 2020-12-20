@@ -5,13 +5,10 @@
  */
 package com.jobits.pos.persistence.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jobits.pos.persistence.Mesa;
 import com.jobits.pos.persistence.Orden;
 import com.jobits.pos.persistence.ProductoVenta;
-import com.jobits.pos.persistence.ProductovOrden;
-import com.jobits.pos.persistence.ProductovOrdenPK;
 
 /**
  * FirstDream
@@ -23,17 +20,17 @@ import com.jobits.pos.persistence.ProductovOrdenPK;
 public class ProductoVentaOrdenModel {
 
     private float enviadosACocina;
-    private ProductovOrdenPK productoVentaOrdenPK;
     private float cantidad;
     private Orden orden;
     private ProductoVenta productoVenta;
     private int numeroComensal;
     private Mesa mesa;
     private String nota;
-
-    public ProductoVentaOrdenModel(float enviadosACocina, ProductovOrdenPK productoVentaOrdenPK, float cantidad, Orden orden, ProductoVenta productoVenta, int numeroComensal, Mesa mesa, String nota) {
+    private int productoVentaOrdenId;
+    
+    public ProductoVentaOrdenModel(float enviadosACocina, int productoVentaOrdenId, float cantidad, Orden orden, ProductoVenta productoVenta, int numeroComensal, Mesa mesa, String nota) {
         this.enviadosACocina = enviadosACocina;
-        this.productoVentaOrdenPK = productoVentaOrdenPK;
+        this.productoVentaOrdenId = productoVentaOrdenId;
         this.cantidad = cantidad;
         this.orden = orden;
         this.productoVenta = productoVenta;
@@ -50,12 +47,12 @@ public class ProductoVentaOrdenModel {
         this.enviadosACocina = enviadosACocina;
     }
 
-    public ProductovOrdenPK getProductoVentaOrdenPK() {
-        return productoVentaOrdenPK;
+    public int getProductoVentaOrdenId() {
+        return productoVentaOrdenId;
     }
 
-    public void setProductoVentaOrdenPK(ProductovOrdenPK productoVentaOrdenPK) {
-        this.productoVentaOrdenPK = productoVentaOrdenPK;
+    public void setProductoVentaOrdenId(int productoVentaOrdenId) {
+        this.productoVentaOrdenId = productoVentaOrdenId;
     }
 
     public float getCantidad() {
