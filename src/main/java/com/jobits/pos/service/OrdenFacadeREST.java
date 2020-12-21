@@ -90,11 +90,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setMesacodMesa(m);
         o.setPersonalusuario(p);
         o.setVentafecha(v.getFecha());
+        o.setVentaid(v);
         o.setDeLaCasa(false);
         o.setHoraComenzada(new Date());
         o.setOrdenvalorMonetario(Float.valueOf("0"));
         o.setPorciento(m.getAreacodArea().getPorcientoPorServicio().floatValue());
-
         getEntityManager().getTransaction().begin();
         super.create(o);
         getEntityManager().getTransaction().commit();
