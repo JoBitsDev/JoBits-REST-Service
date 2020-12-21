@@ -2,6 +2,8 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'war'
 
+sourceCompatibility = '1.8'
+
 repositories {
     jcenter()
 }
@@ -16,7 +18,7 @@ buildscript {
 dependencies {
     // https://mvnrepository.com/artifact/javax/javaee-api
     //Java ee
-    providedCompile group: 'javax', name: 'javaee-api', version: '6.0'
+    providedCompile 'javax:javaee-web-api:7.0'
 
     //Cargo
     // https://mvnrepository.com/artifact/com.bmuschko/gradle-cargo-plugin
@@ -24,7 +26,7 @@ dependencies {
     
     //JAX-RS
     // https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api
-    compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0.1'
+    //compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1.1'
 
     
     //Java Persistence API
@@ -48,10 +50,12 @@ dependencies {
 
     //Jersey
     // Jersey core Servlet 3.x implementation
-    compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.15'
+    //compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '3.0.0'
     // https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-servlet
-    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.15'
+    //compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '3.0.0'
 
+    //REST implementation
+    implementation 'org.glassfish.jersey.bundles:jaxrs-ri:2.33'
 
     
     // Jersey Test Framework — Grizzly2 container
@@ -62,7 +66,7 @@ dependencies {
 apply plugin: 'com.bmuschko.cargo'
 
 cargo{
-    containerId = 'tomcat8x'
+    containerId = 'tomcat9x'
     port = 8080
     
     deployable{
@@ -72,7 +76,7 @@ cargo{
     local{
         homeDir = file(project.properties['server_location'])
         outputFile = file(project.properties['logs_location'])
-        jvmArgs = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+        //jvmArgs = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
         startStopTimeout = 60000
 
         containerProperties {
