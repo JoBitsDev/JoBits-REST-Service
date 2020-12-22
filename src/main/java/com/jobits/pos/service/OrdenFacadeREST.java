@@ -179,6 +179,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             founded = new ProductovOrden();
             founded.setOrden(o);
             founded.setProductoVenta(producto);
+            founded.setPrecioVendido(producto.getPrecioVenta());
+            founded.setNombreProductoVendido(producto.toString());
             founded.setCantidad(cantidad);
             founded.setEnviadosacocina((float) 0);
             founded.setNumeroComensal(0);
