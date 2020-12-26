@@ -201,7 +201,12 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @POST
     @Path("REMOVE")
     public Response removeProducto(String hashMap, @Context HttpServletRequest inRequest) {
-
+        int nivelAcceso = 0;
+        try {
+            nivelAcceso = AuthenticationFilter.getCredentialsFromToken(getToken(inRequest)).getAccessLevel();
+        } catch (CredentialNotFoundException ex) {
+            return toJsonString(Response.Status.NOT_FOUND, "Credenciales no encontradas");
+        }
         HashMap<String, Object> values;
         try {
             values = new ObjectMapper().readValue(hashMap, HashMap.class);
@@ -227,6 +232,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         if (contains != -1) {
             ProductovOrden p = po.get(contains);
             float cant = p.getCantidad();
+            if (cant <= p.getEnviadosacocina()) {
+                if (nivelAcceso < R.NivelAcceso.CAJERO.getNivel()) {
+                    return toJsonString(Response.Status.FORBIDDEN, "Debe solicitar permiso a un cajeo o superior");
+                }
+            }
             if (cant > cantidad) {
                 p.setCantidad(cant - cantidad);
 
