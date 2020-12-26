@@ -6,9 +6,6 @@
 package com.jobits.pos.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.jobits.pos.persistence.Mesa;
-import com.jobits.pos.persistence.Orden;
-import com.jobits.pos.persistence.ProductoVenta;
 
 /**
  * FirstDream
@@ -22,20 +19,19 @@ public class ProductoVentaOrdenModel {
     private float enviadosACocina;
     private ProductovOrdenPKModel productoVentaOrdenPK;
     private float cantidad;
-    private Orden orden;
-    private ProductoVenta productoVenta;
+    private ProductoVentaModel productoVenta;
     private int numeroComensal;
-    private Mesa mesa;
     private String nota;
 
-    public ProductoVentaOrdenModel(float enviadosACocina, ProductovOrdenPKModel productoVentaOrdenPK, float cantidad, Orden orden, ProductoVenta productoVenta, int numeroComensal, Mesa mesa, String nota) {
+    public ProductoVentaOrdenModel(float enviadosACocina,
+            ProductovOrdenPKModel productoVentaOrdenPK, float cantidad,
+            ProductoVentaModel productoVenta, int numeroComensal,
+            String nota) {
         this.enviadosACocina = enviadosACocina;
         this.productoVentaOrdenPK = productoVentaOrdenPK;
         this.cantidad = cantidad;
-        this.orden = orden;
         this.productoVenta = productoVenta;
         this.numeroComensal = numeroComensal;
-        this.mesa = mesa;
         this.nota = nota;
     }
 
@@ -63,19 +59,11 @@ public class ProductoVentaOrdenModel {
         this.cantidad = cantidad;
     }
 
-    public Orden getOrden() {
-        return orden;
-    }
-
-    public void setOrden(Orden orden) {
-        this.orden = orden;
-    }
-
-    public ProductoVenta getProductoVenta() {
+    public ProductoVentaModel getProductoVenta() {
         return productoVenta;
     }
 
-    public void setProductoVenta(ProductoVenta productoVenta) {
+    public void setProductoVenta(ProductoVentaModel productoVenta) {
         this.productoVenta = productoVenta;
     }
 
@@ -87,14 +75,6 @@ public class ProductoVentaOrdenModel {
         this.numeroComensal = numeroComensal;
     }
 
-    public Mesa getMesa() {
-        return mesa;
-    }
-
-    public void setMesa(Mesa mesa) {
-        this.mesa = mesa;
-    }
-
     public String getNota() {
         return nota;
     }
@@ -102,7 +82,5 @@ public class ProductoVentaOrdenModel {
     public void setNota(String nota) {
         this.nota = nota;
     }
-    
-    
 
 }

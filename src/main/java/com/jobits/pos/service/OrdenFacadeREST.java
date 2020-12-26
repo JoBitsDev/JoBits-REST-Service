@@ -23,6 +23,7 @@ import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.controllers.IPVController;
 import com.jobits.pos.notificationdelivery.Notificable;
 import com.jobits.pos.notificationdelivery.Notificador;
+import com.jobits.pos.persistence.models.OrdenConverter;
 import com.jobits.pos.printservice.Impresion;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @GET
     @Secured
     public Response getOrden(@QueryParam("codOrden") String codOrden) {
-        return toJsonString(Response.Status.OK, find(codOrden));
+        return toJsonString(Response.Status.OK, new OrdenConverter().apply(find(codOrden)));
     }
 
     @RolesAllowed("0")
@@ -199,7 +200,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Secured
     @POST
     @Path("REMOVE")
-    public Response removeProducto(String hashMap) {
+    public Response removeProducto(String hashMap, @Context HttpServletRequest inRequest) {
 
         HashMap<String, Object> values;
         try {
