@@ -5,6 +5,7 @@
  */
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
@@ -79,6 +80,7 @@ public class ProductovOrden implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "productovOrden")
     private List<NotificacionEnvioCocina> notificacionEnvioCocinaList;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "productovOrden")
+    @JsonIgnore //TODO: los json van en otros modelos no en los de base de datos
     private Nota nota;
     @JoinColumn(name = "ordencod_orden", referencedColumnName = "cod_orden")
     @ManyToOne(optional = false)
