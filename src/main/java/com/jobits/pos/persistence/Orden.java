@@ -87,7 +87,7 @@ public class Orden implements Serializable, Comparable<Orden> {
     @JoinColumn(name = "personalusuario", referencedColumnName = "usuario", nullable = true)
     @ManyToOne(optional = true)
     private Personal personalusuario;
-    @OneToMany(mappedBy = "orden", orphanRemoval = true,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "orden", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ProductovOrden> productovOrdenList;
 
     public Orden() {
@@ -190,13 +190,14 @@ public class Orden implements Serializable, Comparable<Orden> {
         this.personalusuario = personalusuario;
     }
 
-
     public List<ProductovOrden> getProductovOrdenList() {
         List<ProductovOrden> aux = new ArrayList<>();
         for (ProductovOrden productovOrden : productovOrdenList) {
             if (productovOrden.getAgregadoA() == null) {
                 aux.add(productovOrden);
-                aux.addAll(productovOrden.getAgregos());
+                if (productovOrden.getAgregos() != null) {
+                    aux.addAll(productovOrden.getAgregos());
+                }
             }
         }
         return aux;

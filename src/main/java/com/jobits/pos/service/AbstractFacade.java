@@ -10,20 +10,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.Credentials;
 import com.jobits.pos.authentication.TennantWrapper;
 import com.jobits.pos.persistence.Venta;
-import com.jobits.pos.persistence.pasarela.Token;
 import com.jobits.pos.persistence.repository.DatabaseRepository;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import javax.xml.ws.WebServiceContext;
+
 
 /**
  *
@@ -31,8 +27,6 @@ import javax.xml.ws.WebServiceContext;
  */
 public class AbstractFacade<T> {
 
-    @Resource
-    WebServiceContext webServiceContext;
 
     private Class<T> entityClass;
 

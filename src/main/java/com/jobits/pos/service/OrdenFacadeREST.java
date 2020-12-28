@@ -23,6 +23,7 @@ import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.controllers.IPVController;
 import com.jobits.pos.notificationdelivery.Notificable;
 import com.jobits.pos.notificationdelivery.Notificador;
+import com.jobits.pos.persistence.models.OrdenConverter;
 import com.jobits.pos.printservice.Impresion;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @GET
     @Secured
     public Response getOrden(@QueryParam("codOrden") String codOrden) {
-        return toJsonString(Response.Status.OK, find(codOrden));
+        return toJsonString(Response.Status.OK, new OrdenConverter().apply(find(codOrden)));
     }
 
     @RolesAllowed("0")
@@ -90,11 +91,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         o.setMesacodMesa(m);
         o.setPersonalusuario(p);
         o.setVentafecha(v.getFecha());
+        o.setVentaid(v);
         o.setDeLaCasa(false);
         o.setHoraComenzada(new Date());
         o.setOrdenvalorMonetario(Float.valueOf("0"));
         o.setPorciento(m.getAreacodArea().getPorcientoPorServicio().floatValue());
-
         getEntityManager().getTransaction().begin();
         super.create(o);
         getEntityManager().getTransaction().commit();
@@ -179,6 +180,8 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
             founded = new ProductovOrden();
             founded.setOrden(o);
             founded.setProductoVenta(producto);
+            founded.setPrecioVendido(producto.getPrecioVenta());
+            founded.setNombreProductoVendido(producto.toString());
             founded.setCantidad(cantidad);
             founded.setEnviadosacocina((float) 0);
             founded.setNumeroComensal(0);
@@ -197,8 +200,13 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
     @Secured
     @POST
     @Path("REMOVE")
-    public Response removeProducto(String hashMap) {
-
+    public Response removeProducto(String hashMap, @Context HttpServletRequest inRequest) {
+        int nivelAcceso = 0;
+        try {
+            nivelAcceso = AuthenticationFilter.getCredentialsFromToken(getToken(inRequest)).getAccessLevel();
+        } catch (CredentialNotFoundException ex) {
+            return toJsonString(Response.Status.NOT_FOUND, "Credenciales no encontradas");
+        }
         HashMap<String, Object> values;
         try {
             values = new ObjectMapper().readValue(hashMap, HashMap.class);
@@ -224,6 +232,11 @@ public class OrdenFacadeREST extends AbstractFacade<Orden> {
         if (contains != -1) {
             ProductovOrden p = po.get(contains);
             float cant = p.getCantidad();
+            if (cant <= p.getEnviadosacocina()) {
+                if (nivelAcceso < R.NivelAcceso.CAJERO.getNivel()) {
+                    return toJsonString(Response.Status.FORBIDDEN, "Debe solicitar permiso a un cajeo o superior");
+                }
+            }
             if (cant > cantidad) {
                 p.setCantidad(cant - cantidad);
 
