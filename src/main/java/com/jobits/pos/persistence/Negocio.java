@@ -16,8 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -26,12 +24,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "negocio")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Negocio.findAll", query = "SELECT n FROM Negocio n")
-    , @NamedQuery(name = "Negocio.findByIdNegocio", query = "SELECT n FROM Negocio n WHERE n.idNegocio = :idNegocio")
-    , @NamedQuery(name = "Negocio.findByNombre", query = "SELECT n FROM Negocio n WHERE n.nombre = :nombre")
-    , @NamedQuery(name = "Negocio.findByMonedaPrincipal", query = "SELECT n FROM Negocio n WHERE n.monedaPrincipal = :monedaPrincipal")})
+    @NamedQuery(name = "Negocio.findAll", query = "SELECT n FROM Negocio n"),
+    @NamedQuery(name = "Negocio.findByIdNegocio", query = "SELECT n FROM Negocio n WHERE n.idNegocio = :idNegocio"),
+    @NamedQuery(name = "Negocio.findByNombre", query = "SELECT n FROM Negocio n WHERE n.nombre = :nombre"),
+    @NamedQuery(name = "Negocio.findByMonedaPrincipal", query = "SELECT n FROM Negocio n WHERE n.monedaPrincipal = :monedaPrincipal")})
 public class Negocio implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,10 +37,8 @@ public class Negocio implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_negocio")
     private Integer idNegocio;
-    @Size(max = 100)
     @Column(name = "nombre")
     private String nombre;
-    @Size(max = 5)
     @Column(name = "moneda_principal")
     private String monedaPrincipal;
 
@@ -100,7 +95,7 @@ public class Negocio implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Negocio[ idNegocio=" + idNegocio + " ]";
+        return "restManager.persistencia.Negocio[ idNegocio=" + idNegocio + " ]";
     }
 
 }

@@ -10,8 +10,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * FirstDream
@@ -22,13 +20,9 @@ import javax.validation.constraints.Size;
 public class InsumoAlmacenPK implements Serializable {
 
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 6)
     @Column(name = "insumocod_insumo")
     private String insumocodInsumo;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 4)
     @Column(name = "almacencod_almacen")
     private String almacencodAlmacen;
 
@@ -82,7 +76,7 @@ public class InsumoAlmacenPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.InsumoAlmacenPK[ insumocodInsumo=" + insumocodInsumo + ", almacencodAlmacen=" + almacencodAlmacen + " ]";
+        return "restManager.persistencia.InsumoAlmacenPK[ insumocodInsumo=" + insumocodInsumo + ", almacencodAlmacen=" + almacencodAlmacen + " ]";
     }
 
 }

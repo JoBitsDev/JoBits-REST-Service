@@ -26,7 +26,7 @@ public class DetallesVentasModel {
         List<DetallesVentasModel> ret = new ArrayList<>();
         for (ProductovOrden x : productoVentaList) {
             ret.add(new DetallesVentasModel(x.getProductoVenta().getNombre()
-                    , x.getProductoVenta().getPCod()
+                    , x.getProductoVenta().getCodigoProducto()
                     , x.getCantidad()
                     , utils.setDosLugaresDecimales(x.getProductoVenta().getPrecioVenta())
                     , utils.setDosLugaresDecimales(x.getCantidad() * x.getProductoVenta().getPrecioVenta())));

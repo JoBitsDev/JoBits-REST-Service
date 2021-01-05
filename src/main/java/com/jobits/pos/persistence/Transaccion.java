@@ -3,13 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.jobits.pos.persistence;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -30,81 +26,59 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
- *
  * @author Jorge
- *
+ * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "transaccion")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Transaccion.findAll", query = "SELECT t FROM Transaccion t")
-    , @NamedQuery(name = "Transaccion.findByNoTransaccion", query = "SELECT t FROM Transaccion t WHERE t.noTransaccion = :noTransaccion")
-    , @NamedQuery(name = "Transaccion.findByFecha", query = "SELECT t FROM Transaccion t WHERE t.fecha = :fecha")
-    , @NamedQuery(name = "Transaccion.findByHora", query = "SELECT t FROM Transaccion t WHERE t.hora = :hora")
-    , @NamedQuery(name = "Transaccion.findByCantidad", query = "SELECT t FROM Transaccion t WHERE t.cantidad = :cantidad")
-    , @NamedQuery(name = "Transaccion.findByDescripcion", query = "SELECT t FROM Transaccion t WHERE t.descripcion = :descripcion")})
+    @NamedQuery(name = "Transaccion.findAll", query = "SELECT t FROM Transaccion t"),
+    @NamedQuery(name = "Transaccion.findByNoTransaccion", query = "SELECT t FROM Transaccion t WHERE t.noTransaccion = :noTransaccion"),
+    @NamedQuery(name = "Transaccion.findByFecha", query = "SELECT t FROM Transaccion t WHERE t.fecha = :fecha"),
+    @NamedQuery(name = "Transaccion.findByHora", query = "SELECT t FROM Transaccion t WHERE t.hora = :hora"),
+    @NamedQuery(name = "Transaccion.findByCantidad", query = "SELECT t FROM Transaccion t WHERE t.cantidad = :cantidad"),
+    @NamedQuery(name = "Transaccion.findByDescripcion", query = "SELECT t FROM Transaccion t WHERE t.descripcion = :descripcion")})
 public class Transaccion implements Serializable {
 
     @JoinColumn(name = "operacionno_operacion", referencedColumnName = "no_operacion")
     @ManyToOne
-    @JsonIgnore
     private Operacion operacionnoOperacion;
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id_transaccion_generator")
-    @SequenceGenerator(name = "id_transaccion_generator", allocationSize = 1)
     @Basic(optional = false)
     @Column(name = "no_transaccion")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id_transaccion_generator")
+    @SequenceGenerator(name = "id_transaccion_generator" ,allocationSize = 1)
     private Integer noTransaccion;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date fecha;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "hora")
     @Temporal(TemporalType.TIME)
     private Date hora;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "cantidad")
     private Float cantidad;
-    @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonIgnore
     private TransaccionSalida transaccionSalida;
-
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonIgnore
     private TransaccionTraspaso transaccionTraspaso;
-
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonIgnore
     private TransaccionEntrada transaccionEntrada;
-
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo")
     @ManyToOne(optional = false)
     private Insumo insumocodInsumo;
-
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonIgnore
     private TransaccionMerma transaccionMerma;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaccion")
-    @JsonIgnore
     private List<TransaccionTransformacion> transaccionTransformacionList;
 
     public Transaccion() {
@@ -200,7 +174,6 @@ public class Transaccion implements Serializable {
         this.transaccionMerma = transaccionMerma;
     }
 
-    @XmlTransient
     public List<TransaccionTransformacion> getTransaccionTransformacionList() {
         return transaccionTransformacionList;
     }
@@ -231,7 +204,7 @@ public class Transaccion implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Transaccion[ noTransaccion=" + noTransaccion + " ]";
+        return getInsumocodInsumo() + "_" + getCantidad() ;
     }
 
     public Operacion getOperacionnoOperacion() {

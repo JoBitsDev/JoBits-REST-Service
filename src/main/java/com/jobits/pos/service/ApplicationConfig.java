@@ -7,12 +7,15 @@ package com.jobits.pos.service;
 
 import java.util.Map;
 import java.util.Set;
+import javax.servlet.annotation.WebServlet;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 /**
  *
  * @author Jorge
  */
+@ApplicationPath("/pos")
 public class ApplicationConfig extends Application {
 
     @Override

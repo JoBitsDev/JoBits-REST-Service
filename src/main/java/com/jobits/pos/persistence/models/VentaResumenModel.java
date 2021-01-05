@@ -8,10 +8,6 @@ package com.jobits.pos.persistence.models;
 import com.jobits.pos.persistence.Venta;
 import com.jobits.utils.utils;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Clase para enviar la informacion en JSON y parsearla en el dispositivo
@@ -20,7 +16,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Jorge
  *
  */
-@XmlRootElement
 public class VentaResumenModel {
 
     private final float ventaTotal,

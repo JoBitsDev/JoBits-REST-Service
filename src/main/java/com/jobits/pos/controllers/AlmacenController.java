@@ -111,7 +111,7 @@ public class AlmacenController {
         float sumaTransformacion = 0;
         for (TransaccionTransformacion i : items) {
             sumaTransformacion += i.getCantidadUsada();
-            if (!selected.getInsumo().getProductosDerivados().contains(i.getInsumo())) {
+            if (!selected.getInsumo().getInsumoDerivadoList().contains(i.getInsumo())) {
                 throw new IllegalArgumentException("El insumo " + i.getInsumo() + " no es un insumo derivado de " + selected.getInsumo()
                         + " y no es posible transformarlo");
             }
@@ -140,7 +140,7 @@ public class AlmacenController {
 
             }
         }
-        if (insumoADarSalida.getCantidad() < x.getTransaccion().getCantidad()) {
+        if (insumoADarSalida.getCantidad()< x.getTransaccion().getCantidad()) {
             throw new BadRequestException("La cantidad de " + insumoADarSalida + " es mayor que la existencia actual");
         }
         IpvRegistro reg = (IpvRegistro) em1.createNamedQuery("IpvRegistro.findByIpvcocinacodCocinaAndFechaAndInsumo")
@@ -151,10 +151,10 @@ public class AlmacenController {
         reg.setEntrada(reg.getEntrada() + x.getTransaccion().getCantidad());
 
         reg.setDisponible(reg.getEntrada() + reg.getInicio());
-        reg.setFinal1(reg.getDisponible() - reg.getConsumo());
+        reg.setFinalCalculado(reg.getDisponible() - reg.getConsumo());
         if (reg.getConsumoReal() != null) {
             if (reg.getConsumoReal() > 0) {
-                reg.setFinal1(reg.getDisponible() - reg.getConsumoReal());
+                reg.setFinalAjustado(reg.getDisponible() - reg.getConsumoReal());
             }
         }
         em1.merge(reg);

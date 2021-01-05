@@ -6,6 +6,10 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -16,34 +20,30 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
  * @author Jorge
  * 
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class ,property = "productoInsumoPK",scope = ProductoInsumo.class)
 @Entity
 @Table(name = "producto_insumo")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "ProductoInsumo.findAll", query = "SELECT p FROM ProductoInsumo p")
-    , @NamedQuery(name = "ProductoInsumo.findByProductoVentapCod", query = "SELECT p FROM ProductoInsumo p WHERE p.productoInsumoPK.productoVentapCod = :productoVentapCod")
-    , @NamedQuery(name = "ProductoInsumo.findByInsumocodInsumo", query = "SELECT p FROM ProductoInsumo p WHERE p.productoInsumoPK.insumocodInsumo = :insumocodInsumo")
-    , @NamedQuery(name = "ProductoInsumo.findByCantidad", query = "SELECT p FROM ProductoInsumo p WHERE p.cantidad = :cantidad")
-    , @NamedQuery(name = "ProductoInsumo.findByCosto", query = "SELECT p FROM ProductoInsumo p WHERE p.costo = :costo")})
+    @NamedQuery(name = "ProductoInsumo.findAll", query = "SELECT p FROM ProductoInsumo p"),
+    @NamedQuery(name = "ProductoInsumo.findByProductoVentapCod", query = "SELECT p FROM ProductoInsumo p WHERE p.productoInsumoPK.productoVentapCod = :productoVentapCod"),
+    @NamedQuery(name = "ProductoInsumo.findByInsumocodInsumo", query = "SELECT p FROM ProductoInsumo p WHERE p.productoInsumoPK.insumocodInsumo = :insumocodInsumo"),
+    @NamedQuery(name = "ProductoInsumo.findByCantidad", query = "SELECT p FROM ProductoInsumo p WHERE p.cantidad = :cantidad"),
+    @NamedQuery(name = "ProductoInsumo.findByCosto", query = "SELECT p FROM ProductoInsumo p WHERE p.costo = :costo")})
 public class ProductoInsumo implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected ProductoInsumoPK productoInsumoPK;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "cantidad")
     private float cantidad;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "costo")
     private float costo;
     @JoinColumn(name = "insumocod_insumo", referencedColumnName = "cod_insumo", insertable = false, updatable = false)
@@ -132,7 +132,7 @@ public class ProductoInsumo implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.ProductoInsumo[ productoInsumoPK=" + productoInsumoPK + " ]";
+        return "restManager.persistencia.ProductoInsumo[ productoInsumoPK=" + productoInsumoPK + " ]";
     }
 
 }

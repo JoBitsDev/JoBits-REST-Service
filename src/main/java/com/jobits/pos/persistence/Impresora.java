@@ -16,9 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -27,35 +24,32 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "impresora")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Impresora.findAll", query = "SELECT i FROM Impresora i")
-    , @NamedQuery(name = "Impresora.findByCodImpresora", query = "SELECT i FROM Impresora i WHERE i.codImpresora = :codImpresora")
-    , @NamedQuery(name = "Impresora.findByIpImpresora", query = "SELECT i FROM Impresora i WHERE i.ipImpresora = :ipImpresora")
-    , @NamedQuery(name = "Impresora.findByEstaactiva", query = "SELECT i FROM Impresora i WHERE i.estaactiva = :estaactiva")
-    , @NamedQuery(name = "Impresora.findByNombreImpresora", query = "SELECT i FROM Impresora i WHERE i.nombreImpresora = :nombreImpresora")})
-public class Impresora implements Serializable {
+    @NamedQuery(name = "Impresora.findAll", query = "SELECT i FROM Impresora i"),
+    @NamedQuery(name = "Impresora.findByCodImpresora", query = "SELECT i FROM Impresora i WHERE i.codImpresora = :codImpresora"),
+    @NamedQuery(name = "Impresora.findByIpImpresora", query = "SELECT i FROM Impresora i WHERE i.ipImpresora = :ipImpresora"),
+    @NamedQuery(name = "Impresora.findByEstaactiva", query = "SELECT i FROM Impresora i WHERE i.estaactiva = :estaactiva"),
+    @NamedQuery(name = "Impresora.findByNombreImpresora", query = "SELECT i FROM Impresora i WHERE i.nombreImpresora = :nombreImpresora")})
+public class Impresora implements Serializable, Comparable<Impresora> {
+
+    @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
+    @ManyToOne
+    private Area areacodArea;
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 6)
     @Column(name = "cod_impresora")
     private String codImpresora;
-    @Size(max = 15)
+    @Basic(optional = false)
     @Column(name = "ip_impresora")
     private String ipImpresora;
     @Column(name = "estaactiva")
     private Boolean estaactiva;
-    @Size(max = 255)
     @Column(name = "nombre_impresora")
     private String nombreImpresora;
-    @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")
-    @ManyToOne
-    private Area areacodArea;
     @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Cocina cocinacodCocina;
 
     public Impresora() {
@@ -63,6 +57,11 @@ public class Impresora implements Serializable {
 
     public Impresora(String codImpresora) {
         this.codImpresora = codImpresora;
+    }
+
+    public Impresora(String codImpresora, String ipImpresora) {
+        this.codImpresora = codImpresora;
+        this.ipImpresora = ipImpresora;
     }
 
     public String getCodImpresora() {
@@ -97,14 +96,6 @@ public class Impresora implements Serializable {
         this.nombreImpresora = nombreImpresora;
     }
 
-    public Area getAreacodArea() {
-        return areacodArea;
-    }
-
-    public void setAreacodArea(Area areacodArea) {
-        this.areacodArea = areacodArea;
-    }
-
     public Cocina getCocinacodCocina() {
         return cocinacodCocina;
     }
@@ -135,7 +126,20 @@ public class Impresora implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Impresora[ codImpresora=" + codImpresora + " ]";
+        return "restManager.persistencia.Impresora[ codImpresora=" + codImpresora + " ]";
+    }
+
+    public Area getAreacodArea() {
+        return areacodArea;
+    }
+
+    public void setAreacodArea(Area areacodArea) {
+        this.areacodArea = areacodArea;
+    }
+
+    @Override
+    public int compareTo(Impresora o) {
+        return this.nombreImpresora.compareTo(o.getNombreImpresora());
     }
 
 }

@@ -6,8 +6,11 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -16,24 +19,28 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 /**
  * FirstDream
  * @author Jorge
  * 
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class ,property = "gastoVentaPK",scope = GastoVenta.class)
 @Entity
 @Table(name = "gasto_venta")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "GastoVenta.findAll", query = "SELECT g FROM GastoVenta g")
-    , @NamedQuery(name = "GastoVenta.findByGastocodGasto", query = "SELECT g FROM GastoVenta g WHERE g.gastoVentaPK.gastocodGasto = :gastocodGasto")
-    , @NamedQuery(name = "GastoVenta.findByVentafecha", query = "SELECT g FROM GastoVenta g WHERE g.gastoVentaPK.ventafecha = :ventafecha")
-    , @NamedQuery(name = "GastoVenta.findByImporte", query = "SELECT g FROM GastoVenta g WHERE g.importe = :importe")
-    , @NamedQuery(name = "GastoVenta.findByDescripcion", query = "SELECT g FROM GastoVenta g WHERE g.descripcion = :descripcion")})
+    @NamedQuery(name = "GastoVenta.findAll", query = "SELECT g FROM GastoVenta g"),
+    @NamedQuery(name = "GastoVenta.findByGastocodGasto", query = "SELECT g FROM GastoVenta g WHERE g.gastoVentaPK.gastocodGasto = :gastocodGasto"),
+    @NamedQuery(name = "GastoVenta.findByImporte", query = "SELECT g FROM GastoVenta g WHERE g.importe = :importe"),
+    @NamedQuery(name = "GastoVenta.findByDescripcion", query = "SELECT g FROM GastoVenta g WHERE g.descripcion = :descripcion")})
 public class GastoVenta implements Serializable {
+
+    @JoinColumn(name = "ventaid", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private Venta venta;
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -41,15 +48,11 @@ public class GastoVenta implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "importe")
     private Float importe;
-    @Size(max = 100)
     @Column(name = "descripcion")
     private String descripcion;
     @JoinColumn(name = "gastocod_gasto", referencedColumnName = "cod_gasto", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Gasto gasto;
-    @JoinColumn(name = "ventafecha", referencedColumnName = "fecha", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private Venta venta;
 
     public GastoVenta() {
     }
@@ -58,8 +61,8 @@ public class GastoVenta implements Serializable {
         this.gastoVentaPK = gastoVentaPK;
     }
 
-    public GastoVenta(String gastocodGasto, Date ventafecha) {
-        this.gastoVentaPK = new GastoVentaPK(gastocodGasto, ventafecha);
+    public GastoVenta(String gastocodGasto, int ventaid) {
+        this.gastoVentaPK = new GastoVentaPK(gastocodGasto, ventaid);
     }
 
     public GastoVentaPK getGastoVentaPK() {
@@ -124,7 +127,7 @@ public class GastoVenta implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.GastoVenta[ gastoVentaPK=" + gastoVentaPK + " ]";
+        return "restManager.persistencia.GastoVenta[ gastoVentaPK=" + gastoVentaPK + " ]";
     }
 
 }

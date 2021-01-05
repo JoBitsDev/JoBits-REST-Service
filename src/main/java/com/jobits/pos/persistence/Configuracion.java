@@ -14,9 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -25,26 +22,22 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "configuracion")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Configuracion.findAll", query = "SELECT c FROM Configuracion c")
-    , @NamedQuery(name = "Configuracion.findByNombre", query = "SELECT c FROM Configuracion c WHERE c.nombre = :nombre")
-    , @NamedQuery(name = "Configuracion.findByValor", query = "SELECT c FROM Configuracion c WHERE c.valor = :valor")
-    , @NamedQuery(name = "Configuracion.findByValorString", query = "SELECT c FROM Configuracion c WHERE c.valorString = :valorString")})
+    @NamedQuery(name = "Configuracion.findAll", query = "SELECT c FROM Configuracion c"),
+    @NamedQuery(name = "Configuracion.findByNombre", query = "SELECT c FROM Configuracion c WHERE c.nombre = :nombre"),
+    @NamedQuery(name = "Configuracion.findByValor", query = "SELECT c FROM Configuracion c WHERE c.valor = :valor")})
 public class Configuracion implements Serializable {
+
+    @Column(name = "valor_string")
+    private String valorString;
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "valor")
     private Integer valor;
-    @Size(max = 255)
-    @Column(name = "valor_string")
-    private String valorString;
 
     public Configuracion() {
     }
@@ -69,14 +62,6 @@ public class Configuracion implements Serializable {
         this.valor = valor;
     }
 
-    public String getValorString() {
-        return valorString;
-    }
-
-    public void setValorString(String valorString) {
-        this.valorString = valorString;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -99,7 +84,15 @@ public class Configuracion implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Configuracion[ nombre=" + nombre + " ]";
+        return "restManager.persistencia.Configuracion[ nombre=" + nombre + " ]";
+    }
+
+    public String getValorString() {
+        return valorString;
+    }
+
+    public void setValorString(String valorString) {
+        this.valorString = valorString;
     }
 
 }

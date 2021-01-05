@@ -32,11 +32,10 @@ import javax.persistence.Persistence;
  */
 public class VentaResumenController {
 
-    protected static EntityManagerFactory e = Persistence.createEntityManagerFactory("Restaurant_Manager_Web_ServicePU");
-    protected static EntityManager em1 = e.createEntityManager();
+    protected static EntityManager em1;
 
-    public static VentaResumenModel createResumenFromVenta(Venta v) {
-
+    public static VentaResumenModel createResumenFromVenta(EntityManager e,Venta v) {
+        em1 = e;
         List<DpteListModel> dptes = getDpteListModel(v);
         List<AreaListModel> areas = getAreaListModel(v);
         List<PuntoElaboracionListModel> ptosElaboracion = getPtosElaboracionListmodel(v);
@@ -80,10 +79,6 @@ public class VentaResumenController {
     }
 
     private static List findAll(Class entityClass) {
-        e.getCache().evictAll();
-        em1.close();
-        em1 = e.createEntityManager();
-
         javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
         return em1.createQuery(cq).getResultList();

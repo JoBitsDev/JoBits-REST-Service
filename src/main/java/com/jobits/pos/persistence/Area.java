@@ -3,63 +3,70 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "codArea", scope = Area.class)
 @Entity
 @Table(name = "area")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Area.findAll", query = "SELECT a FROM Area a")
-    , @NamedQuery(name = "Area.findByCodArea", query = "SELECT a FROM Area a WHERE a.codArea = :codArea")
-    , @NamedQuery(name = "Area.findByCapacidad", query = "SELECT a FROM Area a WHERE a.capacidad = :capacidad")
-    , @NamedQuery(name = "Area.findByNombre", query = "SELECT a FROM Area a WHERE a.nombre = :nombre")
-    , @NamedQuery(name = "Area.findByPorcientoPorServicio", query = "SELECT a FROM Area a WHERE a.porcientoPorServicio = :porcientoPorServicio")})
-public class Area implements Serializable {
+    @NamedQuery(name = "Area.findAll", query = "SELECT a FROM Area a"),
+    @NamedQuery(name = "Area.findByCodArea", query = "SELECT a FROM Area a WHERE a.codArea = :codArea"),
+    @NamedQuery(name = "Area.findByCapacidad", query = "SELECT a FROM Area a WHERE a.capacidad = :capacidad"),
+    @NamedQuery(name = "Area.findByNombre", query = "SELECT a FROM Area a WHERE a.nombre = :nombre")})
+public class Area implements Serializable, Comparable<Area> {
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "areacodArea")
+    private List<Impresora> impresoraList;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "areacodArea")
+    private List<PuestoTrabajo> puestoTrabajoList;
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 4)
     @Column(name = "cod_area")
     private String codArea;
     @Column(name = "capacidad")
     private Integer capacidad;
-    @Size(max = 20)
-    @Column(name = "nombre")
-    private String nombre;
     @Column(name = "porciento_por_servicio")
     private Integer porcientoPorServicio;
-    @ManyToMany(mappedBy = "areaList")
+    @Column(name = "nombre")
+    private String nombre;
+    @JsonIgnore
+    @ManyToMany()
+    @JoinTable(name = "carta_area", joinColumns = {
+        @JoinColumn(name = "areacod_area", referencedColumnName = "cod_area")}, inverseJoinColumns = {
+        @JoinColumn(name = "cartacod_carta", referencedColumnName = "cod_carta")})
     private List<Carta> cartaList;
-    @OneToMany(mappedBy = "areacodArea")
+    @JsonIgnore
+    @OneToMany(mappedBy = "areacodArea", cascade = {CascadeType.ALL})
     private List<Mesa> mesaList;
-    @OneToMany(mappedBy = "areacodArea")
-    private List<Impresora> impresoraList;
-    @OneToMany(mappedBy = "areacodArea")
-    private List<PuestoTrabajo> puestoTrabajoList;
 
     public Area() {
     }
@@ -92,15 +99,6 @@ public class Area implements Serializable {
         this.nombre = nombre;
     }
 
-    public Integer getPorcientoPorServicio() {
-        return porcientoPorServicio;
-    }
-
-    public void setPorcientoPorServicio(Integer porcientoPorServicio) {
-        this.porcientoPorServicio = porcientoPorServicio;
-    }
-
-    @XmlTransient
     public List<Carta> getCartaList() {
         return cartaList;
     }
@@ -109,31 +107,12 @@ public class Area implements Serializable {
         this.cartaList = cartaList;
     }
 
-    @XmlTransient
     public List<Mesa> getMesaList() {
         return mesaList;
     }
 
     public void setMesaList(List<Mesa> mesaList) {
         this.mesaList = mesaList;
-    }
-
-    @XmlTransient
-    public List<Impresora> getImpresoraList() {
-        return impresoraList;
-    }
-
-    public void setImpresoraList(List<Impresora> impresoraList) {
-        this.impresoraList = impresoraList;
-    }
-
-    @XmlTransient
-    public List<PuestoTrabajo> getPuestoTrabajoList() {
-        return puestoTrabajoList;
-    }
-
-    public void setPuestoTrabajoList(List<PuestoTrabajo> puestoTrabajoList) {
-        this.puestoTrabajoList = puestoTrabajoList;
     }
 
     @Override
@@ -158,7 +137,35 @@ public class Area implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Area[ codArea=" + codArea + " ]";
+        return nombre + " [ " + codArea + " ]";
     }
 
+    public Integer getPorcientoPorServicio() {
+        return porcientoPorServicio;
+    }
+
+    public void setPorcientoPorServicio(Integer porcientoPorServicio) {
+        this.porcientoPorServicio = porcientoPorServicio;
+    }
+
+    public List<PuestoTrabajo> getPuestoTrabajoList() {
+        return puestoTrabajoList;
+    }
+
+    public void setPuestoTrabajoList(List<PuestoTrabajo> puestoTrabajoList) {
+        this.puestoTrabajoList = puestoTrabajoList;
+    }
+
+    public List<Impresora> getImpresoraList() {
+        return impresoraList;
+    }
+
+    public void setImpresoraList(List<Impresora> impresoraList) {
+        this.impresoraList = impresoraList;
+    }
+
+    @Override
+    public int compareTo(Area o) {
+        return this.nombre.compareTo(o.getNombre());
+    }
 }

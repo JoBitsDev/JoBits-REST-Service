@@ -3,41 +3,38 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package com.jobits.pos.persistence;
-
-import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+package com.jobits.pos.persistence.models;
 
 /**
- * FirstDream
+ *
+ * JoBits
+ *
  * @author Jorge
- * 
+ *
  */
-@Embeddable
-public class ProductovOrdenPK implements Serializable {
+public class ProductovOrdenPKModel {
 
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 7)
-    @Column(name = "producto_ventap_cod")
     private String productoVentapCod;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 11)
-    @Column(name = "ordencod_orden")
+
     private String ordencodOrden;
 
-    public ProductovOrdenPK() {
+    private int productoOrdenId;
+
+    public int getProductoOrdenId() {
+        return productoOrdenId;
     }
 
-    public ProductovOrdenPK(String productoVentapCod, String ordencodOrden) {
+    public void setProductoOrdenId(int productoOrdenId) {
+        this.productoOrdenId = productoOrdenId;
+    }
+
+    public ProductovOrdenPKModel() {
+    }
+
+    public ProductovOrdenPKModel(String productoVentapCod, String ordencodOrden, int productoOrdenId) {
         this.productoVentapCod = productoVentapCod;
         this.ordencodOrden = ordencodOrden;
+        this.productoOrdenId = productoOrdenId;
     }
 
     public String getProductoVentapCod() {
@@ -67,10 +64,10 @@ public class ProductovOrdenPK implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ProductovOrdenPK)) {
+        if (!(object instanceof ProductovOrdenPKModel)) {
             return false;
         }
-        ProductovOrdenPK other = (ProductovOrdenPK) object;
+        ProductovOrdenPKModel other = (ProductovOrdenPKModel) object;
         if ((this.productoVentapCod == null && other.productoVentapCod != null) || (this.productoVentapCod != null && !this.productoVentapCod.equals(other.productoVentapCod))) {
             return false;
         }
@@ -82,7 +79,7 @@ public class ProductovOrdenPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.ProductovOrdenPK[ productoVentapCod=" + productoVentapCod + ", ordencodOrden=" + ordencodOrden + " ]";
+        return "com.restManager.ProductoVentaOrdenPKModel[ productoVentapCod=" + productoVentapCod + ", ordencodOrden=" + ordencodOrden + " ]";
     }
 
 }

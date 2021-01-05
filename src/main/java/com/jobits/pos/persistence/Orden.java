@@ -5,11 +5,8 @@
  */
 package com.jobits.pos.persistence;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -26,11 +23,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.ArrayList;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import org.eclipse.persistence.oxm.annotations.XmlReadOnly;
 
 /**
  * FirstDream
@@ -38,39 +32,41 @@ import org.eclipse.persistence.oxm.annotations.XmlReadOnly;
  * @author Jorge
  *
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "codOrden", scope = Orden.class)
 @Entity
 @Table(name = "orden")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Orden.findAll", query = "SELECT o FROM Orden o")
-    , @NamedQuery(name = "Orden.findByCodOrden", query = "SELECT o FROM Orden o WHERE o.codOrden = :codOrden")
-    , @NamedQuery(name = "Orden.findByHoraComenzada", query = "SELECT o FROM Orden o WHERE o.horaComenzada = :horaComenzada")
-    , @NamedQuery(name = "Orden.findByHoraTerminada", query = "SELECT o FROM Orden o WHERE o.horaTerminada = :horaTerminada")
-    , @NamedQuery(name = "Orden.findByDeLaCasa", query = "SELECT o FROM Orden o WHERE o.deLaCasa = :deLaCasa")
-    , @NamedQuery(name = "Orden.findByPorciento", query = "SELECT o FROM Orden o WHERE o.porciento = :porciento")
-    , @NamedQuery(name = "Orden.findByGananciaXporciento", query = "SELECT o FROM Orden o WHERE o.gananciaXporciento = :gananciaXporciento")
-    , @NamedQuery(name = "Orden.findByOrdenvalorMonetario", query = "SELECT o FROM Orden o WHERE o.ordenvalorMonetario = :ordenvalorMonetario")
-    , @NamedQuery(name = "Orden.findByOrdengastoEninsumos", query = "SELECT o FROM Orden o WHERE o.ordengastoEninsumos = :ordengastoEninsumos")})
-public class Orden implements Serializable {
+    @NamedQuery(name = "Orden.findAll", query = "SELECT o FROM Orden o"),
+    @NamedQuery(name = "Orden.findByCodOrden", query = "SELECT o FROM Orden o WHERE o.codOrden = :codOrden"),
+    @NamedQuery(name = "Orden.findByHoraComenzada", query = "SELECT o FROM Orden o WHERE o.horaComenzada = :horaComenzada"),
+    @NamedQuery(name = "Orden.findByHoraTerminada", query = "SELECT o FROM Orden o WHERE o.horaTerminada = :horaTerminada"),
+    @NamedQuery(name = "Orden.findByDeLaCasa", query = "SELECT o FROM Orden o WHERE o.deLaCasa = :deLaCasa"),
+    @NamedQuery(name = "Orden.findByPorciento", query = "SELECT o FROM Orden o WHERE o.porciento = :porciento"),
+    @NamedQuery(name = "Orden.findByGananciaXporciento", query = "SELECT o FROM Orden o WHERE o.gananciaXporciento = :gananciaXporciento"),
+    @NamedQuery(name = "Orden.findByOrdenvalorMonetario", query = "SELECT o FROM Orden o WHERE o.ordenvalorMonetario = :ordenvalorMonetario"),
+    @NamedQuery(name = "Orden.findByOrdengastoEninsumos", query = "SELECT o FROM Orden o WHERE o.ordengastoEninsumos = :ordengastoEninsumos")})
+public class Orden implements Serializable, Comparable<Orden> {
 
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "ventafecha")
+    @Temporal(TemporalType.DATE)
+    private Date ventafecha;
+    @JoinColumn(name = "ventaid", referencedColumnName = "id")
+    @ManyToOne
+    private Venta ventaid;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 11)
     @Column(name = "cod_orden")
     private String codOrden;
-    @JsonIgnore
     @Column(name = "hora_comenzada")
     @Temporal(TemporalType.TIME)
     private Date horaComenzada;
-    @JsonIgnore
     @Column(name = "hora_terminada")
     @Temporal(TemporalType.TIME)
     private Date horaTerminada;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "de_la_casa")
     private boolean deLaCasa;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -78,32 +74,20 @@ public class Orden implements Serializable {
     private Float porciento;
     @Column(name = "ganancia_xporciento")
     private Float gananciaXporciento;
-    @JsonIgnore
     @Column(name = "ordenvalor_monetario")
     private Float ordenvalorMonetario;
-    @JsonIgnore
     @Column(name = "ordengasto_eninsumos")
     private Float ordengastoEninsumos;
-    @JsonIgnore
-    @JoinColumn(name = "clientecod_cliente", referencedColumnName = "cod_cliente")
+    @JoinColumn(name = "clienteid_cliente", referencedColumnName = "id_cliente")
     @ManyToOne
-    @XmlTransient
-    private Cliente clientecodCliente;
-    @JoinColumn(name = "mesacod_mesa", referencedColumnName = "cod_mesa")
-    @ManyToOne
-    @JsonManagedReference
+    private Cliente clienteIdCliente;
+    @JoinColumn(name = "mesacod_mesa", referencedColumnName = "cod_mesa", nullable = true)
+    @ManyToOne(optional = true)
     private Mesa mesacodMesa;
-    @JsonIgnore
-    @JoinColumn(name = "personalusuario", referencedColumnName = "usuario")
-    @ManyToOne
+    @JoinColumn(name = "personalusuario", referencedColumnName = "usuario", nullable = true)
+    @ManyToOne(optional = true)
     private Personal personalusuario;
-    @JoinColumn(name = "ventafecha", referencedColumnName = "fecha")
-    @ManyToOne(optional = false)
-    @JsonIgnore
-    private Venta ventafecha;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "orden")
-    @XmlReadOnly
-    @JsonProperty("productoVentaOrdenList")
+    @OneToMany(mappedBy = "orden", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ProductovOrden> productovOrdenList;
 
     public Orden() {
@@ -182,12 +166,12 @@ public class Orden implements Serializable {
         this.ordengastoEninsumos = ordengastoEninsumos;
     }
 
-    public Cliente getClientecodCliente() {
-        return clientecodCliente;
+    public Cliente getClienteIdCliente() {
+        return clienteIdCliente;
     }
 
-    public void setClientecodCliente(Cliente clientecodCliente) {
-        this.clientecodCliente = clientecodCliente;
+    public void setClienteIdCliente(Cliente clienteIdCliente) {
+        this.clienteIdCliente = clienteIdCliente;
     }
 
     public Mesa getMesacodMesa() {
@@ -206,17 +190,17 @@ public class Orden implements Serializable {
         this.personalusuario = personalusuario;
     }
 
-    public Venta getVentafecha() {
-        return ventafecha;
-    }
-
-    public void setVentafecha(Venta ventafecha) {
-        this.ventafecha = ventafecha;
-    }
-
-    @XmlTransient
     public List<ProductovOrden> getProductovOrdenList() {
-        return productovOrdenList;
+        List<ProductovOrden> aux = new ArrayList<>();
+        for (ProductovOrden productovOrden : productovOrdenList) {
+            if (productovOrden.getAgregadoA() == null) {
+                aux.add(productovOrden);
+                if (productovOrden.getAgregos() != null) {
+                    aux.addAll(productovOrden.getAgregos());
+                }
+            }
+        }
+        return aux;
     }
 
     public void setProductovOrdenList(List<ProductovOrden> productovOrdenList) {
@@ -245,7 +229,37 @@ public class Orden implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.Orden[ codOrden=" + codOrden + " ]";
+        return codOrden;
+    }
+
+    @Override
+    public int compareTo(Orden o) {
+        int o2 = Integer.parseInt(o.getCodOrden().split("-")[1]);
+        int o1 = Integer.parseInt(getCodOrden().split("-")[1]);
+
+        if (o1 > o2) {
+            return 1;
+        }
+        if (o1 < o2) {
+            return -1;
+        }
+        return 0;
+    }
+
+    public Date getVentafecha() {
+        return ventafecha;
+    }
+
+    public void setVentafecha(Date ventafecha) {
+        this.ventafecha = ventafecha;
+    }
+
+    public Venta getVentaid() {
+        return ventaid;
+    }
+
+    public void setVentaid(Venta ventaid) {
+        this.ventaid = ventaid;
     }
 
 }

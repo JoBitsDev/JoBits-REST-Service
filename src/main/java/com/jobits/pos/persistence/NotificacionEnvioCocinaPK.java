@@ -10,8 +10,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * FirstDream
@@ -22,28 +20,18 @@ import javax.validation.constraints.Size;
 public class NotificacionEnvioCocinaPK implements Serializable {
 
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 5)
     @Column(name = "cocinacod_cocina")
     private String cocinacodCocina;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 7)
-    @Column(name = "productov_ordenproducto_ventap_cod")
-    private String productovOrdenproductoVentapCod;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 11)
-    @Column(name = "productov_ordenordencod_orden")
-    private String productovOrdenordencodOrden;
+    @Column(name = "productov_ordenid")
+    private Integer productovOrdenId;
 
     public NotificacionEnvioCocinaPK() {
     }
 
-    public NotificacionEnvioCocinaPK(String cocinacodCocina, String productovOrdenproductoVentapCod, String productovOrdenordencodOrden) {
+    public NotificacionEnvioCocinaPK(String cocinacodCocina, int productovOrdenproductoVentapCod) {
         this.cocinacodCocina = cocinacodCocina;
-        this.productovOrdenproductoVentapCod = productovOrdenproductoVentapCod;
-        this.productovOrdenordencodOrden = productovOrdenordencodOrden;
+        this.productovOrdenId = productovOrdenproductoVentapCod;
     }
 
     public String getCocinacodCocina() {
@@ -54,28 +42,19 @@ public class NotificacionEnvioCocinaPK implements Serializable {
         this.cocinacodCocina = cocinacodCocina;
     }
 
-    public String getProductovOrdenproductoVentapCod() {
-        return productovOrdenproductoVentapCod;
+    public int getProductovOrdenId() {
+        return productovOrdenId;
     }
 
-    public void setProductovOrdenproductoVentapCod(String productovOrdenproductoVentapCod) {
-        this.productovOrdenproductoVentapCod = productovOrdenproductoVentapCod;
-    }
-
-    public String getProductovOrdenordencodOrden() {
-        return productovOrdenordencodOrden;
-    }
-
-    public void setProductovOrdenordencodOrden(String productovOrdenordencodOrden) {
-        this.productovOrdenordencodOrden = productovOrdenordencodOrden;
+    public void setProductovOrdenId(Integer productovOrdenId) {
+        this.productovOrdenId = productovOrdenId;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (cocinacodCocina != null ? cocinacodCocina.hashCode() : 0);
-        hash += (productovOrdenproductoVentapCod != null ? productovOrdenproductoVentapCod.hashCode() : 0);
-        hash += (productovOrdenordencodOrden != null ? productovOrdenordencodOrden.hashCode() : 0);
+        hash += (productovOrdenId != null ? productovOrdenId.hashCode() : 0);
         return hash;
     }
 
@@ -89,10 +68,7 @@ public class NotificacionEnvioCocinaPK implements Serializable {
         if ((this.cocinacodCocina == null && other.cocinacodCocina != null) || (this.cocinacodCocina != null && !this.cocinacodCocina.equals(other.cocinacodCocina))) {
             return false;
         }
-        if ((this.productovOrdenproductoVentapCod == null && other.productovOrdenproductoVentapCod != null) || (this.productovOrdenproductoVentapCod != null && !this.productovOrdenproductoVentapCod.equals(other.productovOrdenproductoVentapCod))) {
-            return false;
-        }
-        if ((this.productovOrdenordencodOrden == null && other.productovOrdenordencodOrden != null) || (this.productovOrdenordencodOrden != null && !this.productovOrdenordencodOrden.equals(other.productovOrdenordencodOrden))) {
+        if ((this.productovOrdenId == null && other.productovOrdenId != null) || (this.productovOrdenId != null && !this.productovOrdenId.equals(other.productovOrdenId))) {
             return false;
         }
         return true;
@@ -100,7 +76,7 @@ public class NotificacionEnvioCocinaPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.NotificacionEnvioCocinaPK[ cocinacodCocina=" + cocinacodCocina + ", productovOrdenproductoVentapCod=" + productovOrdenproductoVentapCod + ", productovOrdenordencodOrden=" + productovOrdenordencodOrden + " ]";
+        return "restManager.persistencia.NotificacionEnvioCocinaPK[ cocinacodCocina=" + cocinacodCocina + ", productovOrdenproductoVentapCod=" + productovOrdenId + ", productovOrdenordencodOrden=" +  " ]";
     }
 
 }

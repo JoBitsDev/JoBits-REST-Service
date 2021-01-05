@@ -8,6 +8,7 @@ package com.jobits.pos.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,8 +18,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -27,23 +26,21 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "transaccion_traspaso")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "TransaccionTraspaso.findAll", query = "SELECT t FROM TransaccionTraspaso t")
-    , @NamedQuery(name = "TransaccionTraspaso.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionTraspaso t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion")})
+    @NamedQuery(name = "TransaccionTraspaso.findAll", query = "SELECT t FROM TransaccionTraspaso t"),
+    @NamedQuery(name = "TransaccionTraspaso.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionTraspaso t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion")})
 public class TransaccionTraspaso implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
     @Column(name = "transaccionno_transaccion")
     private Integer transaccionnoTransaccion;
     @JoinColumn(name = "almacen_destino", referencedColumnName = "cod_almacen")
     @ManyToOne(optional = false)
     private Almacen almacenDestino;
     @JoinColumn(name = "transaccionno_transaccion", referencedColumnName = "no_transaccion", insertable = false, updatable = false)
-    @OneToOne(optional = false)
+    @OneToOne(optional = false,cascade = CascadeType.ALL)
     private Transaccion transaccion;
 
     public TransaccionTraspaso() {
@@ -86,7 +83,6 @@ public class TransaccionTraspaso implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof TransaccionTraspaso)) {
             return false;
         }
@@ -99,7 +95,7 @@ public class TransaccionTraspaso implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.TransaccionTraspaso[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
+        return "restManager.persistencia.TransaccionTraspaso[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
     }
 
 }

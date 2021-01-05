@@ -17,8 +17,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -27,16 +25,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "transaccion_salida")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "TransaccionSalida.findAll", query = "SELECT t FROM TransaccionSalida t")
-    , @NamedQuery(name = "TransaccionSalida.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionSalida t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion")})
+    @NamedQuery(name = "TransaccionSalida.findAll", query = "SELECT t FROM TransaccionSalida t"),
+    @NamedQuery(name = "TransaccionSalida.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionSalida t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion")})
 public class TransaccionSalida implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
     @Column(name = "transaccionno_transaccion")
     private Integer transaccionnoTransaccion;
     @JoinColumn(name = "cocinacod_cocina", referencedColumnName = "cod_cocina")
@@ -99,7 +95,7 @@ public class TransaccionSalida implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.TransaccionSalida[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
+        return "restManager.persistencia.TransaccionSalida[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
     }
 
 }

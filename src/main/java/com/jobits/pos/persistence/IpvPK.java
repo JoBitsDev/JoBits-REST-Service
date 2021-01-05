@@ -6,29 +6,25 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * FirstDream
  * @author Jorge
  * 
  */
+@JsonRootName(value = "ipvPK")
 @Embeddable
 public class IpvPK implements Serializable {
 
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 6)
     @Column(name = "insumocod_insumo")
     private String insumocodInsumo;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 5)
     @Column(name = "cocinacod_cocina")
     private String cocinacodCocina;
 
@@ -82,7 +78,7 @@ public class IpvPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.IpvPK[ insumocodInsumo=" + insumocodInsumo + ", cocinacodCocina=" + cocinacodCocina + " ]";
+        return "restManager.persistencia.IpvPK[ insumocodInsumo=" + insumocodInsumo + ", cocinacodCocina=" + cocinacodCocina + " ]";
     }
 
 }

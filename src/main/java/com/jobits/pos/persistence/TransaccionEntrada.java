@@ -6,8 +6,6 @@
 
 package com.jobits.pos.persistence;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -18,8 +16,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FirstDream
@@ -28,19 +24,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "transaccion_entrada")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "TransaccionEntrada.findAll", query = "SELECT t FROM TransaccionEntrada t")
-    , @NamedQuery(name = "TransaccionEntrada.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionEntrada t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion")
-    , @NamedQuery(name = "TransaccionEntrada.findByJustificado", query = "SELECT t FROM TransaccionEntrada t WHERE t.justificado = :justificado")
-    , @NamedQuery(name = "TransaccionEntrada.findByPrecioPorUnidad", query = "SELECT t FROM TransaccionEntrada t WHERE t.precioPorUnidad = :precioPorUnidad")
-    , @NamedQuery(name = "TransaccionEntrada.findByValorTotal", query = "SELECT t FROM TransaccionEntrada t WHERE t.valorTotal = :valorTotal")})
+    @NamedQuery(name = "TransaccionEntrada.findAll", query = "SELECT t FROM TransaccionEntrada t"),
+    @NamedQuery(name = "TransaccionEntrada.findByTransaccionnoTransaccion", query = "SELECT t FROM TransaccionEntrada t WHERE t.transaccionnoTransaccion = :transaccionnoTransaccion"),
+    @NamedQuery(name = "TransaccionEntrada.findByJustificado", query = "SELECT t FROM TransaccionEntrada t WHERE t.justificado = :justificado"),
+    @NamedQuery(name = "TransaccionEntrada.findByPrecioPorUnidad", query = "SELECT t FROM TransaccionEntrada t WHERE t.precioPorUnidad = :precioPorUnidad"),
+    @NamedQuery(name = "TransaccionEntrada.findByValorTotal", query = "SELECT t FROM TransaccionEntrada t WHERE t.valorTotal = :valorTotal")})
 public class TransaccionEntrada implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
     @Column(name = "transaccionno_transaccion")
     private Integer transaccionnoTransaccion;
     @Column(name = "justificado")
@@ -52,7 +46,6 @@ public class TransaccionEntrada implements Serializable {
     private Float valorTotal;
     @JoinColumn(name = "transaccionno_transaccion", referencedColumnName = "no_transaccion", insertable = false, updatable = false)
     @OneToOne(optional = false)
-    @JsonBackReference
     private Transaccion transaccion;
 
     public TransaccionEntrada() {
@@ -124,7 +117,7 @@ public class TransaccionEntrada implements Serializable {
 
     @Override
     public String toString() {
-        return  "Transaccion No. " + transaccionnoTransaccion ;
+        return "restManager.persistencia.TransaccionEntrada[ transaccionnoTransaccion=" + transaccionnoTransaccion + " ]";
     }
 
 }

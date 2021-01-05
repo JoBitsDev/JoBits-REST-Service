@@ -5,7 +5,11 @@
  */
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -17,10 +21,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
@@ -28,37 +28,31 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Jorge
  *
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "codInsumo", scope = Insumo.class)
 @Entity
 @Table(name = "insumo")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Insumo.findAll", query = "SELECT i FROM Insumo i")
-    , @NamedQuery(name = "Insumo.findByCodInsumo", query = "SELECT i FROM Insumo i WHERE i.codInsumo = :codInsumo")
-    , @NamedQuery(name = "Insumo.findByNombre", query = "SELECT i FROM Insumo i WHERE i.nombre = :nombre")
-    , @NamedQuery(name = "Insumo.findByUm", query = "SELECT i FROM Insumo i WHERE i.um = :um")
-    , @NamedQuery(name = "Insumo.findByElaborado", query = "SELECT i FROM Insumo i WHERE i.elaborado = :elaborado")
-    , @NamedQuery(name = "Insumo.findByCostoPorUnidad", query = "SELECT i FROM Insumo i WHERE i.costoPorUnidad = :costoPorUnidad")
-    , @NamedQuery(name = "Insumo.findByStockEstimation", query = "SELECT i FROM Insumo i WHERE i.stockEstimation = :stockEstimation")
-    , @NamedQuery(name = "Insumo.findByCantidadCreada", query = "SELECT i FROM Insumo i WHERE i.cantidadCreada = :cantidadCreada")})
-public class Insumo implements Serializable {
+    @NamedQuery(name = "Insumo.findAll", query = "SELECT i FROM Insumo i"),
+    @NamedQuery(name = "Insumo.findByCodInsumo", query = "SELECT i FROM Insumo i WHERE i.codInsumo = :codInsumo"),
+    @NamedQuery(name = "Insumo.findByNombre", query = "SELECT i FROM Insumo i WHERE i.nombre = :nombre"),
+    @NamedQuery(name = "Insumo.findByUm", query = "SELECT i FROM Insumo i WHERE i.um = :um"),
+    @NamedQuery(name = "Insumo.findByElaborado", query = "SELECT i FROM Insumo i WHERE i.elaborado = :elaborado"),
+    @NamedQuery(name = "Insumo.findByCostoPorUnidad", query = "SELECT i FROM Insumo i WHERE i.costoPorUnidad = :costoPorUnidad"),
+    @NamedQuery(name = "Insumo.findByStockEstimation", query = "SELECT i FROM Insumo i WHERE i.stockEstimation = :stockEstimation"),
+    @NamedQuery(name = "Insumo.findByCantidadCreada", query = "SELECT i FROM Insumo i WHERE i.cantidadCreada = :cantidadCreada")})
+public class Insumo implements Serializable, Comparable<Insumo> {
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 6)
     @Column(name = "cod_insumo")
     private String codInsumo;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 60)
     @Column(name = "nombre")
     private String nombre;
-    @Size(max = 3)
     @Column(name = "um")
     private String um;
     @Column(name = "elaborado")
-    @JsonIgnore
     private Boolean elaborado;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "costo_por_unidad")
@@ -66,29 +60,24 @@ public class Insumo implements Serializable {
     @Column(name = "stock_estimation")
     private Float stockEstimation;
     @Column(name = "cantidad_creada")
-    @JsonIgnore
     private Float cantidadCreada;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo", orphanRemoval = true)
     private List<ProductoInsumo> productoInsumoList;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumocodInsumo")
-    @JsonIgnore
     private List<Transaccion> transaccionList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     private List<InsumoAlmacen> insumoAlmacenList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     private List<Ipv> ipvList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo", orphanRemoval = true)
+    private List<InsumoElaborado> insumoDerivadoList;
     @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
     private List<TransaccionTransformacion> transaccionTransformacionList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "derivante")
-    @JsonIgnore
-    private List<InsumoElaborado> productosDerivados;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "insumo")
-    @JsonIgnore
-    private List<InsumoElaborado> productosDerivantes;
 
     public Insumo() {
     }
@@ -158,7 +147,6 @@ public class Insumo implements Serializable {
         this.cantidadCreada = cantidadCreada;
     }
 
-    @XmlTransient
     public List<ProductoInsumo> getProductoInsumoList() {
         return productoInsumoList;
     }
@@ -167,7 +155,6 @@ public class Insumo implements Serializable {
         this.productoInsumoList = productoInsumoList;
     }
 
-    @XmlTransient
     public List<Transaccion> getTransaccionList() {
         return transaccionList;
     }
@@ -176,7 +163,6 @@ public class Insumo implements Serializable {
         this.transaccionList = transaccionList;
     }
 
-    @XmlTransient
     public List<InsumoAlmacen> getInsumoAlmacenList() {
         return insumoAlmacenList;
     }
@@ -185,7 +171,6 @@ public class Insumo implements Serializable {
         this.insumoAlmacenList = insumoAlmacenList;
     }
 
-    @XmlTransient
     public List<Ipv> getIpvList() {
         return ipvList;
     }
@@ -194,31 +179,12 @@ public class Insumo implements Serializable {
         this.ipvList = ipvList;
     }
 
-    @XmlTransient
-    public List<TransaccionTransformacion> getTransaccionTransformacionList() {
-        return transaccionTransformacionList;
+    public List<InsumoElaborado> getInsumoDerivadoList() {
+        return insumoDerivadoList;
     }
 
-    public void setTransaccionTransformacionList(List<TransaccionTransformacion> transaccionTransformacionList) {
-        this.transaccionTransformacionList = transaccionTransformacionList;
-    }
-
-    @XmlTransient
-    public List<InsumoElaborado> getProductosDerivados() {
-        return productosDerivados;
-    }
-
-    public void setProductosDerivados(List<InsumoElaborado> productosDerivados) {
-        this.productosDerivados = productosDerivados;
-    }
-
-    @XmlTransient
-    public List<InsumoElaborado> getProductosDerivantes() {
-        return productosDerivantes;
-    }
-
-    public void setProductosDerivantes(List<InsumoElaborado> productosDerivantes) {
-        this.productosDerivantes = productosDerivantes;
+    public void setInsumoDerivadoList(List<InsumoElaborado> insumoDerivadoList) {
+        this.insumoDerivadoList = insumoDerivadoList;
     }
 
     @Override
@@ -230,7 +196,7 @@ public class Insumo implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-       // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the id fields are not set
         if (object instanceof InsumoElaborado) {
             InsumoElaborado e = (InsumoElaborado) object;
             return e.getInsumo().getCodInsumo().equals(this.codInsumo);
@@ -247,7 +213,20 @@ public class Insumo implements Serializable {
 
     @Override
     public String toString() {
-        return nombre +" ("+um +")";
+        return nombre + "(" + codInsumo + ")" + "(" + um + ")";
+    }
+
+    public List<TransaccionTransformacion> getTransaccionTransformacionList() {
+        return transaccionTransformacionList;
+    }
+
+    public void setTransaccionTransformacionList(List<TransaccionTransformacion> transaccionTransformacionList) {
+        this.transaccionTransformacionList = transaccionTransformacionList;
+    }
+
+    @Override
+    public int compareTo(Insumo o) {
+        return this.nombre.compareTo(o.getNombre());
     }
 
 }

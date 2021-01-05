@@ -6,6 +6,9 @@
 
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -19,22 +22,19 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
  * @author Jorge
  * 
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property = "idGasto" ,scope = TipoGasto.class)
 @Entity
 @Table(name = "tipo_gasto")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "TipoGasto.findAll", query = "SELECT t FROM TipoGasto t")
-    , @NamedQuery(name = "TipoGasto.findByIdGasto", query = "SELECT t FROM TipoGasto t WHERE t.idGasto = :idGasto")
-    , @NamedQuery(name = "TipoGasto.findByNombre", query = "SELECT t FROM TipoGasto t WHERE t.nombre = :nombre")})
+    @NamedQuery(name = "TipoGasto.findAll", query = "SELECT t FROM TipoGasto t"),
+    @NamedQuery(name = "TipoGasto.findByIdGasto", query = "SELECT t FROM TipoGasto t WHERE t.idGasto = :idGasto"),
+    @NamedQuery(name = "TipoGasto.findByNombre", query = "SELECT t FROM TipoGasto t WHERE t.nombre = :nombre")})
 public class TipoGasto implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,7 +43,6 @@ public class TipoGasto implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_gasto")
     private Integer idGasto;
-    @Size(max = 100)
     @Column(name = "nombre")
     private String nombre;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tipoGastoidGasto")
@@ -72,7 +71,6 @@ public class TipoGasto implements Serializable {
         this.nombre = nombre;
     }
 
-    @XmlTransient
     public List<Gasto> getGastoList() {
         return gastoList;
     }
@@ -103,7 +101,7 @@ public class TipoGasto implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.TipoGasto[ idGasto=" + idGasto + " ]";
+        return "restManager.persistencia.TipoGasto[ idGasto=" + idGasto + " ]";
     }
 
 }

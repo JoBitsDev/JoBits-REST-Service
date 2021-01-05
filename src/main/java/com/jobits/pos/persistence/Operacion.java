@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,26 +23,26 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
 @Entity
 @Table(name = "operacion")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Operacion.findAll", query = "SELECT o FROM Operacion o")
-    , @NamedQuery(name = "Operacion.findByNoOperacion", query = "SELECT o FROM Operacion o WHERE o.noOperacion = :noOperacion")
-    , @NamedQuery(name = "Operacion.findByFecha", query = "SELECT o FROM Operacion o WHERE o.fecha = :fecha")
-    , @NamedQuery(name = "Operacion.findByNoRecibo", query = "SELECT o FROM Operacion o WHERE o.noRecibo = :noRecibo")
-    , @NamedQuery(name = "Operacion.findByRecibidoPor", query = "SELECT o FROM Operacion o WHERE o.recibidoPor = :recibidoPor")
-    , @NamedQuery(name = "Operacion.findByHora", query = "SELECT o FROM Operacion o WHERE o.hora = :hora")})
+    @NamedQuery(name = "Operacion.findAll", query = "SELECT o FROM Operacion o"),
+    @NamedQuery(name = "Operacion.findByNoOperacion", query = "SELECT o FROM Operacion o WHERE o.noOperacion = :noOperacion"),
+    @NamedQuery(name = "Operacion.findByFecha", query = "SELECT o FROM Operacion o WHERE o.fecha = :fecha"),
+    @NamedQuery(name = "Operacion.findByRecibidoPor", query = "SELECT o FROM Operacion o WHERE o.recibidoPor = :recibidoPor"),
+    @NamedQuery(name = "Operacion.findByHora", query = "SELECT o FROM Operacion o WHERE o.hora = :hora"),
+    @NamedQuery(name = "Operacion.findByNoRecibo", query = "SELECT o FROM Operacion o WHERE o.noRecibo = :noRecibo")})
 public class Operacion implements Serializable {
+
+    @OneToMany(mappedBy = "operacionnoOperacion", cascade = CascadeType.REMOVE)
+    private List<Transaccion> transaccionList;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,23 +53,19 @@ public class Operacion implements Serializable {
     @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date fecha;
-    @Size(max = 100)
-    @Column(name = "no_recibo")
-    private String noRecibo;
-    @Size(max = 100)
     @Column(name = "recibido_por")
     private String recibidoPor;
     @Column(name = "hora")
     @Temporal(TemporalType.TIME)
     private Date hora;
+    @Column(name = "no_recibo")
+    private String noRecibo;
     @JoinColumn(name = "almacen", referencedColumnName = "cod_almacen")
     @ManyToOne(optional = false)
     private Almacen almacen;
     @JoinColumn(name = "proveedor", referencedColumnName = "no_proveedor")
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Proveedor proveedor;
-    @OneToMany(mappedBy = "operacionnoOperacion")
-    private List<Transaccion> transaccionList;
 
     public Operacion() {
     }
@@ -94,14 +90,6 @@ public class Operacion implements Serializable {
         this.fecha = fecha;
     }
 
-    public String getNoRecibo() {
-        return noRecibo;
-    }
-
-    public void setNoRecibo(String noRecibo) {
-        this.noRecibo = noRecibo;
-    }
-
     public String getRecibidoPor() {
         return recibidoPor;
     }
@@ -118,6 +106,14 @@ public class Operacion implements Serializable {
         this.hora = hora;
     }
 
+    public String getNoRecibo() {
+        return noRecibo;
+    }
+
+    public void setNoRecibo(String noRecibo) {
+        this.noRecibo = noRecibo;
+    }
+
     public Almacen getAlmacen() {
         return almacen;
     }
@@ -132,15 +128,6 @@ public class Operacion implements Serializable {
 
     public void setProveedor(Proveedor proveedor) {
         this.proveedor = proveedor;
-    }
-
-    @XmlTransient
-    public List<Transaccion> getTransaccionList() {
-        return transaccionList;
-    }
-
-    public void setTransaccionList(List<Transaccion> transaccionList) {
-        this.transaccionList = transaccionList;
     }
 
     @Override
@@ -165,7 +152,15 @@ public class Operacion implements Serializable {
 
     @Override
     public String toString() {
-        return "com.jobits.pos.persistence.Operacion[ noOperacion=" + noOperacion + " ]";
+        return "restManager.persistencia.Operacion[ noOperacion=" + noOperacion + " ]";
+    }
+
+    public List<Transaccion> getTransaccionList() {
+        return transaccionList;
+    }
+
+    public void setTransaccionList(List<Transaccion> transaccionList) {
+        this.transaccionList = transaccionList;
     }
 
 }

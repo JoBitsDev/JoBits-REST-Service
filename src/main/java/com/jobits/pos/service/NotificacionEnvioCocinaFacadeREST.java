@@ -13,7 +13,11 @@ import com.jobits.pos.persistence.Impresora;
 import com.jobits.pos.persistence.NotificacionEnvioCocina;
 import com.jobits.pos.notificationdelivery.Notificable;
 import com.jobits.pos.notificationdelivery.Notificador;
+import com.jobits.pos.persistence.ProductoVenta;
+import com.jobits.pos.persistence.models.ProductoVentaModel;
 import com.jobits.pos.persistence.models.ProductoVentaOrdenModel;
+import com.jobits.pos.persistence.models.ProductovOrdenPKModel;
+import com.jobits.pos.persistence.models.SeccionModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,20 +82,22 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
         } catch (JsonProcessingException ex) {
             return handleException(ex);
         }
-
-        String codOrden = values.get("codOrden").toString();
-        String codProducto = values.get("codProducto").toString();
+        int codProductoOrden;
+        try {
+            codProductoOrden = Integer.parseInt(values.get("codProductoOrden").toString());
+        } catch (NumberFormatException ex) {
+            return handleException(ex);
+        }
 
         for (NotificacionEnvioCocina x : findAll()) {
-            if (x.getNotificacionEnvioCocinaPK().getProductovOrdenordencodOrden().equals(codOrden)
-                    && x.getNotificacionEnvioCocinaPK().getProductovOrdenproductoVentapCod().equals(codProducto)) {
+            if (x.getNotificacionEnvioCocinaPK().getProductovOrdenId() == codProductoOrden) {
                 x.getProductovOrden().setListoParaRecoger(Boolean.TRUE);
                 x.getProductovOrden().setEnviadosacocina(x.getProductovOrden().getCantidad());
                 getEntityManager().getTransaction().begin();
                 getEntityManager().merge(x.getProductovOrden());
                 getEntityManager().getTransaction().commit();
                 remove(x);
-                new Notificador(x.getIpDependiente(), new Notificable() {
+                new Notificador(x.getIp_dependiente(), new Notificable() {
                     @Override
                     public String getMensajeNotificacion() {
                         return "Productos a recoger en " + x.getProductovOrden().getProductoVenta().getCocinacodCocina().getNombreCocina();
@@ -114,7 +120,6 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
         return toJsonString(Response.Status.NOT_MODIFIED, "Los parámetros no son válidos o la notificación ya fue enviada \n "
                 + "o el receptor no esta conectado");
     }
-
 
     private void registerDevice(HttpServletRequest inRequest, String cod_cocina) {
         boolean founded = false;
@@ -150,14 +155,24 @@ public class NotificacionEnvioCocinaFacadeREST extends AbstractFacade<Notificaci
     }
 
     private ProductoVentaOrdenModel addProductoVentaOrdenModel(NotificacionEnvioCocina x) {
-        return new ProductoVentaOrdenModel(x.getProductovOrden().getEnviadosacocina()
-                , x.getProductovOrden().getProductovOrdenPK()
-                , x.getCantidad()
-                , x.getProductovOrden().getOrden()
-                , x.getProductovOrden().getProductoVenta()
-                , x.getProductovOrden().getNumeroComensal()
-                , x.getProductovOrden().getOrden().getMesacodMesa()
-                ,x.getProductovOrden().getNota() == null ? "" : x.getProductovOrden().getNota().getDescripcion());
+        ProductoVenta p = x.getProductovOrden().getProductoVenta();
+        SeccionModel seccion = new SeccionModel(
+                p.getSeccionnombreSeccion().getNombreSeccion(),
+                p.getSeccionnombreSeccion().getDescripcion());
+
+        ProductoVentaModel productoVenta = new ProductoVentaModel(
+                p.getCodigoProducto(), p.getNombre(), p.getPrecioVenta(),
+                p.getDescripcion(), seccion);
+
+        ProductovOrdenPKModel pkMode = new ProductovOrdenPKModel(p.getCodigoProducto(),
+                x.getProductovOrden().getOrden().getCodOrden(), x.getProductovOrden().getId());
+
+        String nota = x.getProductovOrden().getNota() != null ? x.getProductovOrden().getNota().getDescripcion() : null;
+
+        ProductoVentaOrdenModel po = new ProductoVentaOrdenModel(x.getProductovOrden().getEnviadosacocina(), pkMode,
+                x.getCantidad(), productoVenta, x.getProductovOrden().getNumeroComensal(), nota);
+        return po;
+
     }
 
 }

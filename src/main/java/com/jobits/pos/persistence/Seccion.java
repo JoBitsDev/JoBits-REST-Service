@@ -3,52 +3,58 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.jobits.pos.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * FirstDream
+ *
  * @author Jorge
- * 
+ *
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "nombreSeccion", scope = Seccion.class)
 @Entity
 @Table(name = "seccion")
-@XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Seccion.findAll", query = "SELECT s FROM Seccion s")
-    , @NamedQuery(name = "Seccion.findByNombreSeccion", query = "SELECT s FROM Seccion s WHERE s.nombreSeccion = :nombreSeccion")
-    , @NamedQuery(name = "Seccion.findByDescripcion", query = "SELECT s FROM Seccion s WHERE s.descripcion = :descripcion")})
-public class Seccion implements Serializable,Comparable<Seccion> {
+    @NamedQuery(name = "Seccion.findAll", query = "SELECT s FROM Seccion s"),
+    @NamedQuery(name = "Seccion.findByNombreSeccion", query = "SELECT s FROM Seccion s WHERE s.nombreSeccion = :nombreSeccion"),
+    @NamedQuery(name = "Seccion.findByDescripcion", query = "SELECT s FROM Seccion s WHERE s.descripcion = :descripcion")})
+public class Seccion implements Serializable, Comparable<Seccion> {
+
+    @JoinTable(name = "seccion_agregada", joinColumns = {
+        @JoinColumn(name = "agregada_en", referencedColumnName = "nombre_seccion")}, inverseJoinColumns = {
+        @JoinColumn(name = "seccionnombre_seccion", referencedColumnName = "nombre_seccion")})
+    @ManyToMany
+    private List<Seccion> agregadoEn;
+    @ManyToMany(mappedBy = "agregadoEn")
+    private List<Seccion> agregos;
 
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 30)
     @Column(name = "nombre_seccion")
     private String nombreSeccion;
-    @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
-    @OneToMany(mappedBy = "seccionnombreSeccion")
+    @OneToMany(mappedBy = "seccionnombreSeccion", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<ProductoVenta> productoVentaList;
     @JoinColumn(name = "cartacod_carta", referencedColumnName = "cod_carta")
@@ -79,7 +85,6 @@ public class Seccion implements Serializable,Comparable<Seccion> {
         this.descripcion = descripcion;
     }
 
-    @XmlTransient
     public List<ProductoVenta> getProductoVentaList() {
         return productoVentaList;
     }
@@ -118,12 +123,28 @@ public class Seccion implements Serializable,Comparable<Seccion> {
 
     @Override
     public String toString() {
-        return "com.restmanager.Seccion[ nombreSeccion=" + nombreSeccion + " ]";
+        return nombreSeccion;
+    }
+
+    public List<Seccion> getAgregadoEn() {
+        return agregadoEn;
+    }
+
+    public void setAgregadoEn(List<Seccion> agregadoEn) {
+        this.agregadoEn = agregadoEn;
+    }
+
+    public List<Seccion> getAgregos() {
+        return agregos;
+    }
+
+    public void setAgregos(List<Seccion> agregos) {
+        this.agregos = agregos;
     }
 
     @Override
     public int compareTo(Seccion o) {
-        return nombreSeccion.compareToIgnoreCase(o.getNombreSeccion());
+        return this.nombreSeccion.compareTo(o.getNombreSeccion());
     }
 
 }

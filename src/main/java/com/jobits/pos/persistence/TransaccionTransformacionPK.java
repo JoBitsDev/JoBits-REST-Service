@@ -10,8 +10,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * FirstDream
@@ -22,12 +20,9 @@ import javax.validation.constraints.Size;
 public class TransaccionTransformacionPK implements Serializable {
 
     @Basic(optional = false)
-    @NotNull
     @Column(name = "transaccionno_transaccion")
     private int transaccionnoTransaccion;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 6)
     @Column(name = "insumocod_insumo")
     private String insumocodInsumo;
 
@@ -65,7 +60,6 @@ public class TransaccionTransformacionPK implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof TransaccionTransformacionPK)) {
             return false;
         }
@@ -81,7 +75,7 @@ public class TransaccionTransformacionPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.restmanager.TransaccionTransformacionPK[ transaccionnoTransaccion=" + transaccionnoTransaccion + ", insumocodInsumo=" + insumocodInsumo + " ]";
+        return "restManager.persistencia.TransaccionTransformacionPK[ transaccionnoTransaccion=" + transaccionnoTransaccion + ", insumocodInsumo=" + insumocodInsumo + " ]";
     }
 
 }
