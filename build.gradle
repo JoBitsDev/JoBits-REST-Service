@@ -4,6 +4,7 @@ apply plugin: 'war'
 
 description = 'JoBits POS:modulo-pos-client-REST'
 //sourceCompatibility = '1.8'
+version = '7.0.1'
 
 repositories {
     jcenter()
@@ -25,11 +26,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.bmuschko/gradle-cargo-plugin
     //compile group: 'com.bmuschko', name: 'gradle-cargo-plugin', version: '2.7.1'
     
-    //JAX-RS
-    // https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api
-    //compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1.1'
 
-    
     //Java Persistence API
     compile group: 'org.datanucleus', name: 'javax.persistence', version: '2.2.2'
     
@@ -47,13 +44,6 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.10.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.2'
-    
-
-    //Jersey
-    // Jersey core Servlet 3.x implementation
-    //compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '3.0.0'
-    // https://mvnrepository.com/artifact/org.glassfish.jersey.containers/jersey-container-servlet
-    //compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '3.0.0'
 
     //REST implementation
     implementation 'org.glassfish.jersey.bundles:jaxrs-ri:2.33'
