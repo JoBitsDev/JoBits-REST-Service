@@ -8,6 +8,7 @@ version = '7.0.1'
 
 repositories {
     jcenter()
+    maven {url = jobitsRepoReadUrl}
 }
 
 buildscript {
@@ -22,10 +23,12 @@ dependencies {
     //Java ee
     providedCompile 'javax:javaee-web-api:7.0'
 
-    //Cargo
-    // https://mvnrepository.com/artifact/com.bmuschko/gradle-cargo-plugin
-    //compile group: 'com.bmuschko', name: 'gradle-cargo-plugin', version: '2.7.1'
-    
+    //    implementation 'com.root101:clean-core:2.1.0.RELEASE.20210118'
+    implementation 'org.jobits.db:org.jobits.db.versioncontrol:1.+'
+    implementation 'org.jobits.pos:org.jobits.pos.core:4.3.0'
+    implementation 'com.root101.clean:com.root101.clean.core:2.1.3'
+
+
 
     //Java Persistence API
     compile group: 'org.datanucleus', name: 'javax.persistence', version: '2.2.2'

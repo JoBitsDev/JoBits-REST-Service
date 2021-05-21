@@ -7,7 +7,7 @@
 package com.jobits.pos.service;
 
 import com.jobits.pos.authentication.Secured;
-import com.jobits.pos.persistence.Seccion;
+import com.jobits.pos.core.domain.models.Seccion;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

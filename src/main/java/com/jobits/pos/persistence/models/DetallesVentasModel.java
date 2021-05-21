@@ -5,7 +5,7 @@
  */
 package com.jobits.pos.persistence.models;
 
-import com.jobits.pos.persistence.ProductovOrden;
+import com.jobits.pos.core.domain.models.ProductovOrden;
 import com.jobits.utils.utils;
 import java.util.ArrayList;
 import java.util.List;

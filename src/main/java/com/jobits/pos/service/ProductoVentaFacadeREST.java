@@ -7,11 +7,11 @@ package com.jobits.pos.service;
 
 import com.jobits.pos.authentication.Secured;
 import com.jobits.pos.controllers.IPVController;
-import com.jobits.pos.persistence.Area;
-import com.jobits.pos.persistence.Carta;
-import com.jobits.pos.persistence.Mesa;
-import com.jobits.pos.persistence.ProductoVenta;
-import com.jobits.pos.persistence.Seccion;
+import com.jobits.pos.core.domain.models.Area;
+import com.jobits.pos.core.domain.models.Carta;
+import com.jobits.pos.core.domain.models.Mesa;
+import com.jobits.pos.core.domain.models.ProductoVenta;
+import com.jobits.pos.core.domain.models.Seccion;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

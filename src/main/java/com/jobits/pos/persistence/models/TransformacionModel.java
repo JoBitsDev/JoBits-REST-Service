@@ -5,7 +5,7 @@
  */
 package com.jobits.pos.persistence.models;
 
-import com.jobits.pos.persistence.InsumoAlmacen;
+import com.jobits.pos.core.domain.models.InsumoAlmacen;
 import java.util.List;
 
 /**

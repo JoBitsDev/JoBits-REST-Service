@@ -6,7 +6,7 @@
 
 package com.jobits.pos.service;
 
-import com.jobits.pos.persistence.ProductovOrden;
+import com.jobits.pos.core.domain.models.ProductovOrden;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;

@@ -4,8 +4,7 @@
  * and open the template in the editor.
  */
 package com.jobits.pos.persistence.models;
-
-import com.jobits.pos.persistence.Venta;
+import com.jobits.pos.core.domain.models.Venta;
 import com.jobits.utils.utils;
 import java.util.List;
 

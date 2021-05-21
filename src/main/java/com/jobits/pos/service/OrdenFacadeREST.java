@@ -5,17 +5,17 @@
  */
 package com.jobits.pos.service;
 
-import com.jobits.pos.persistence.ProductoVenta;
-import com.jobits.pos.persistence.Nota;
-import com.jobits.pos.persistence.Personal;
-import com.jobits.pos.persistence.Venta;
-import com.jobits.pos.persistence.Mesa;
-import com.jobits.pos.persistence.Impresora;
-import com.jobits.pos.persistence.NotificacionEnvioCocinaPK;
-import com.jobits.pos.persistence.Configuracion;
-import com.jobits.pos.persistence.NotificacionEnvioCocina;
-import com.jobits.pos.persistence.ProductovOrden;
-import com.jobits.pos.persistence.Orden;
+import com.jobits.pos.core.domain.models.ProductoVenta;
+import com.jobits.pos.core.domain.models.Nota;
+import com.jobits.pos.core.domain.models.Personal;
+import com.jobits.pos.core.domain.models.Venta;
+import com.jobits.pos.core.domain.models.Mesa;
+import com.jobits.pos.core.domain.models.Impresora;
+import com.jobits.pos.core.domain.models.NotificacionEnvioCocinaPK;
+import com.jobits.pos.core.domain.models.Configuracion;
+import com.jobits.pos.core.domain.models.NotificacionEnvioCocina;
+import com.jobits.pos.core.domain.models.ProductovOrden;
+import com.jobits.pos.core.domain.models.Orden;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.AuthenticationFilter;

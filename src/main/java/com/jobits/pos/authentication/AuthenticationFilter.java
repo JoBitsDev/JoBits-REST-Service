@@ -5,6 +5,7 @@
  */
 package com.jobits.pos.authentication;
 
+import com.jobits.pos.persistence.service.DataBaseUbicacionService;
 import com.jobits.pos.service.AbstractFacade;
 import java.io.IOException;
 import java.util.Arrays;
@@ -77,7 +78,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
         //valida el tennant
         TennantWrapper t = validateTennantToken(tennant);
-        AbstractFacade.setCurrentTennant(t.getTennantEmf());
+       // AbstractFacade.setCurrentTennant(t.getTennantEmf());
+        DataBaseUbicacionService.getInstance().setSelectedConexion(t.getTennantProperties());
+        
+        
     }
 
     public void filterToken(ContainerRequestContext requestContext) throws CredentialException {

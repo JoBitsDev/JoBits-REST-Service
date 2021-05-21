@@ -5,15 +5,15 @@
  */
 package com.jobits.pos.controllers;
 
-import com.jobits.pos.persistence.Insumo;
-import com.jobits.pos.persistence.ProductovOrden;
-import com.jobits.pos.persistence.Cocina;
-import com.jobits.pos.persistence.ProductoInsumo;
-import com.jobits.pos.persistence.IpvRegistroPK;
-import com.jobits.pos.persistence.IpvVentaRegistroPK;
-import com.jobits.pos.persistence.ProductoVenta;
-import com.jobits.pos.persistence.IpvRegistro;
-import com.jobits.pos.persistence.IpvVentaRegistro;
+import com.jobits.pos.core.domain.models.Insumo;
+import com.jobits.pos.core.domain.models.ProductovOrden;
+import com.jobits.pos.core.domain.models.Cocina;
+import com.jobits.pos.core.domain.models.ProductoInsumo;
+import com.jobits.pos.core.domain.models.IpvRegistroPK;
+import com.jobits.pos.core.domain.models.IpvVentaRegistroPK;
+import com.jobits.pos.core.domain.models.ProductoVenta;
+import com.jobits.pos.core.domain.models.IpvRegistro;
+import com.jobits.pos.core.domain.models.IpvVentaRegistro;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +37,7 @@ public class IPVController extends AbstractController {
         ProductoVenta producto = em1.find(ProductoVenta.class, codProducto);
         int cantidadMinima = Integer.MAX_VALUE;
         for (ProductoInsumo x : producto.getProductoInsumoList()) {
-            IpvRegistroPK pk = new IpvRegistroPK(x.getInsumo().getCodInsumo(), producto.getCocinacodCocina().getCodCocina(), fecha);
+            IpvRegistroPK pk = new IpvRegistroPK(x.getInsumo().getCodInsumo(), producto.getCocinacodCocina().getCodCocina(), fecha.getDay());
             IpvRegistro registro = em1.find(IpvRegistro.class, pk);
             if (registro != null) {
                 int aux = (int) (registro.getDisponible() / x.getCantidad());

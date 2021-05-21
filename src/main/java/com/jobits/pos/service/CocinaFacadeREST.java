@@ -5,7 +5,7 @@
  */
 package com.jobits.pos.service;
 
-import com.jobits.pos.persistence.Cocina;
+import com.jobits.pos.core.domain.models.Cocina;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

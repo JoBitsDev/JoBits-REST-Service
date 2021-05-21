@@ -9,17 +9,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobits.pos.authentication.Credentials;
 import com.jobits.pos.authentication.TennantWrapper;
-import com.jobits.pos.persistence.Venta;
+import com.jobits.pos.core.domain.models.Venta;
+import com.jobits.pos.core.module.PosCoreModule;
 import com.jobits.pos.persistence.repository.DatabaseRepository;
 import java.util.HashMap;
 import java.util.List;
-import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-
+import org.jobits.db.pool.ConnectionPoolHandler;
 
 /**
  *
@@ -27,84 +27,64 @@ import javax.ws.rs.core.Response;
  */
 public class AbstractFacade<T> {
 
-
     private Class<T> entityClass;
 
     public static HashMap<String, Credentials> tokens = new HashMap<>();
     public static HashMap<String, TennantWrapper> tennantTokens = new HashMap<>();
 
-    private static EntityManagerFactory e;
-    private static EntityManager em1;
-
     public AbstractFacade(Class<T> entityClass) {
         this.entityClass = entityClass;
-        if (e == null) {
-            e = DatabaseRepository.getDefaultFactory();
-            em1 = e.createEntityManager();
-        }
     }
 
     public static void setCurrentTennant(EntityManagerFactory emfTennant) {
-        e = emfTennant;
-        em1 = e.createEntityManager();
     }
 
     public void create(T entity) {
-        if (em1.getTransaction().isActive()) {
-            em1.persist(entity);
+        if (getEntityManager().getTransaction().isActive()) {
+            getEntityManager().persist(entity);
         } else {
-            em1.getTransaction().begin();
-            em1.persist(entity);
-            em1.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().persist(entity);
+            getEntityManager().getTransaction().commit();
         }
 
     }
 
     public void edit(T entity) {
-        if (em1.getTransaction().isActive()) {
-            em1.merge(entity);
+        if (getEntityManager().getTransaction().isActive()) {
+            getEntityManager().merge(entity);
         } else {
-            em1.getTransaction().begin();
-            em1.merge(entity);
-            em1.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().merge(entity);
+            getEntityManager().getTransaction().commit();
         }
     }
 
     public void remove(T entity) {
-        if (em1.getTransaction().isActive()) {
-            em1.remove(em1.merge(entity));
+        if (getEntityManager().getTransaction().isActive()) {
+            getEntityManager().remove(getEntityManager().merge(entity));
         } else {
-            em1.getTransaction().begin();
-            em1.remove(em1.merge(entity));
-            em1.getTransaction().commit();
+            getEntityManager().getTransaction().begin();
+            getEntityManager().remove(getEntityManager().merge(entity));
+            getEntityManager().getTransaction().commit();
         }
     }
 
     public T find(Object id) {
-        e.getCache().evictAll();
-        EntityManager aux = e.createEntityManager();
-        return aux.find(entityClass, id);
+        return getEntityManager().find(entityClass, id);
     }
 
     public List<T> findAll() {
-        e.getCache().evictAll();
-        em1.close();
-        em1 = e.createEntityManager();
-
-        javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
+        javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
-        return em1.createQuery(cq).getResultList();
+        return getEntityManager().createQuery(cq).getResultList();
 
     }
 
     public List findAll(Class entity) {
-        e.getCache().evictAll();
-        em1.close();
-        em1 = e.createEntityManager();
-
-        javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
+        javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         cq.select(cq.from(entity));
-        return em1.createQuery(cq).getResultList();
+        return getEntityManager().createQuery(cq).getResultList();
 
     }
 
@@ -115,27 +95,26 @@ public class AbstractFacade<T> {
     }
 
     public List<T> findRange(int[] range) {
-        javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
+        javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         cq.select(cq.from(entityClass));
-        javax.persistence.Query q = em1.createQuery(cq);
+        javax.persistence.Query q = getEntityManager().createQuery(cq);
         q.setMaxResults(range[1] - range[0] + 1);
         q.setFirstResult(range[0]);
         return q.getResultList();
     }
 
     public int count() {
-        javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
+        javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         javax.persistence.criteria.Root<T> rt = cq.from(entityClass);
-        cq.select(em1.getCriteriaBuilder().count(rt));
-        javax.persistence.Query q = em1.createQuery(cq);
+        cq.select(getEntityManager().getCriteriaBuilder().count(rt));
+        javax.persistence.Query q = getEntityManager().createQuery(cq);
         return ((Long) q.getSingleResult()).intValue();
     }
 
     public Venta findVenta() {
-        e.getCache().evictAll();
-        javax.persistence.criteria.CriteriaQuery cq = em1.getCriteriaBuilder().createQuery();
+        javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         cq.select(cq.from(Venta.class));
-        List<Venta> ventas = em1.createQuery(cq).getResultList();
+        List<Venta> ventas = getEntityManager().createQuery(cq).getResultList();
         for (int i = ventas.size() - 1; i >= 0; i--) {
             if (ventas.get(i).getVentaTotal() == null) {
                 return ventas.get(i);
@@ -165,10 +144,10 @@ public class AbstractFacade<T> {
         return requestContext.getHeader(HttpHeaders.AUTHORIZATION).substring("Bearer".length()).trim();
     }
 
-      protected String getTennantToken(HttpServletRequest requestContext) {
+    protected String getTennantToken(HttpServletRequest requestContext) {
         return requestContext.getHeader(HttpHeaders.LOCATION).substring("TennantId".length()).trim();
     }
-    
+
     protected void startTransaction() {
         if (!getEntityManager().getTransaction().isActive()) {
             getEntityManager().getTransaction().begin();
@@ -182,11 +161,11 @@ public class AbstractFacade<T> {
     }
 
     protected EntityManager getEntityManager() {
-        return em1;
+        return ConnectionPoolHandler.getConnectionPoolService(PosCoreModule.getInstance().getModuleName()).getCurrentConnection();
     }
-    
-    public static EntityManager getCurrentTennantConnection(){
-        return em1;
+
+    public static EntityManager getCurrentTennantConnection() {
+        return ConnectionPoolHandler.getConnectionPoolService(PosCoreModule.getInstance().getModuleName()).getCurrentConnection();
     }
 
 }

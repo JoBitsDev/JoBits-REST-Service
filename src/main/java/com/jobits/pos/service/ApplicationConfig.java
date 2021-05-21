@@ -36,7 +36,7 @@ public class ApplicationConfig extends Application {
      * out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(com.jobits.pos.service.AlmacenFacadeREST.class);
+        resources.add(com.jobits.pos.service.almacen.AlmacenFacadeREST.class);
         resources.add(com.jobits.pos.service.GeneralFacadeREST.class);
         resources.add(com.jobits.pos.service.CocinaFacadeREST.class);
         resources.add(com.jobits.pos.service.AreaFacadeREST.class);

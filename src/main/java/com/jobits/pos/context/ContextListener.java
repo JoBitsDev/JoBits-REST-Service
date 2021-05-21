@@ -7,13 +7,13 @@ package com.jobits.pos.context;
 
 import com.jobits.pos.persistence.pasarela.Token;
 import com.jobits.pos.persistence.repository.DatabaseRepository;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.jobits.pos.persistence.service.DataBaseUbicacionService;
+import javax.persistence.EntityManager;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import org.jobits.db.core.module.DataVersionControlModule;
+import org.jobits.db.pool.ConnectionPoolHandler;
 
 /**
  *
@@ -32,8 +32,12 @@ public class ContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        Token t = DatabaseRepository.getDefaultConnection().find(Token.class, 1);
-        DatabaseRepository.getDefaultConnection().remove(t);
+        EntityManager em = DatabaseRepository.getDefaultConnection();
+        Token t = em.find(Token.class, 1);
+        em.remove(t);
+        com.jobits.pos.core.module.PosCoreModule.init();
+        DataVersionControlModule.init();
+        org.jobits.db.core.usecase.UbicacionConexionHandler.registerUbicacionConexionService(DataBaseUbicacionService.getInstance());
 //        File f = new File(sce.getServletContext().getRealPath("/") + "ubicaciones.json");
 //        try {
 //            f.createNewFile();
@@ -42,4 +46,4 @@ public class ContextListener implements ServletContextListener {
 //        }
     }
 
-    }
+}

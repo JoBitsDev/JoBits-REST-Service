@@ -6,8 +6,8 @@
 package com.jobits.pos.service;
 
 import com.jobits.pos.authentication.Secured;
-import com.jobits.pos.persistence.Area;
-import com.jobits.pos.persistence.Mesa;
+import com.jobits.pos.core.domain.models.Area;
+import com.jobits.pos.core.domain.models.Mesa;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,7 +47,12 @@ public class AreaFacadeREST extends AbstractFacade<Area> {
         Mesa mesa = getEntityManager().find(Mesa.class, codMesa);
         Area a = mesa.getAreacodArea();
         ArrayList<Mesa> mesas = new ArrayList<>(a.getMesaList());
-        Collections.sort(mesas);
+        Collections.sort(mesas, new Comparator<Mesa>() {
+            @Override
+            public int compare(Mesa o1, Mesa o2) {
+                return o1.getCodMesa().split("-")[1].compareTo(o2.getCodMesa().split("-")[1]);
+            }
+        });
 
         for (Mesa m : mesas) {
             if (m.getEstado().equals("vacia")) {
@@ -69,7 +74,9 @@ public class AreaFacadeREST extends AbstractFacade<Area> {
                 ret.add(mesa);
             }
         }
-        Collections.sort(ret);
+         Collections.sort(ret, 
+                 (Mesa o1, Mesa o2) -> o1.getCodMesa().split("-")[1].
+                         compareTo(o2.getCodMesa().split("-")[1]));
         return toJsonString(Response.Status.OK, ret);
     }
 

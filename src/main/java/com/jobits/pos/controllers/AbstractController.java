@@ -5,7 +5,7 @@
  */
 package com.jobits.pos.controllers;
 
-import com.jobits.pos.persistence.Almacen;
+import com.jobits.pos.core.domain.models.Almacen;
 import javax.persistence.EntityManager;
 
 /**

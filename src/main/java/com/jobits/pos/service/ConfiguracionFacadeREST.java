@@ -6,7 +6,7 @@
 package com.jobits.pos.service;
 
 import com.jobits.pos.authentication.Secured;
-import com.jobits.pos.persistence.Configuracion;
+import com.jobits.pos.core.domain.models.Configuracion;
 import com.jobits.utils.utils;
 import java.io.BufferedReader;
 import java.io.IOException;

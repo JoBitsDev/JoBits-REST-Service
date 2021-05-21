@@ -5,17 +5,17 @@
  */
 package com.jobits.pos.printservice;
 
-import com.jobits.pos.persistence.Almacen;
-import com.jobits.pos.persistence.Cocina;
-import com.jobits.pos.persistence.Configuracion;
-import com.jobits.pos.persistence.Insumo;
-import com.jobits.pos.persistence.InsumoAlmacen;
-import com.jobits.pos.persistence.IpvRegistro;
-import com.jobits.pos.persistence.Orden;
-import com.jobits.pos.persistence.Personal;
-import com.jobits.pos.persistence.ProductovOrden;
-import com.jobits.pos.persistence.Transaccion;
-import com.jobits.pos.persistence.Venta;
+import com.jobits.pos.core.domain.models.Almacen;
+import com.jobits.pos.core.domain.models.Cocina;
+import com.jobits.pos.core.domain.models.Configuracion;
+import com.jobits.pos.core.domain.models.Insumo;
+import com.jobits.pos.core.domain.models.InsumoAlmacen;
+import com.jobits.pos.core.domain.models.IpvRegistro;
+import com.jobits.pos.core.domain.models.Orden;
+import com.jobits.pos.core.domain.models.Personal;
+import com.jobits.pos.core.domain.models.ProductovOrden;
+import com.jobits.pos.core.domain.models.Transaccion;
+import com.jobits.pos.core.domain.models.Venta;
 import com.jobits.pos.service.AbstractFacade;
 
 import java.util.ArrayList;

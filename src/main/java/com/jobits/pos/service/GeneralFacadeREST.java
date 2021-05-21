@@ -6,8 +6,8 @@
 package com.jobits.pos.service;
 
 import com.jobits.pos.authentication.AuthenticationFilter;
-import com.jobits.pos.persistence.Carta;
-import com.jobits.pos.persistence.Negocio;
+import com.jobits.pos.core.domain.models.Carta;
+import com.jobits.pos.core.domain.models.Negocio;
 import javax.persistence.EntityManager;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

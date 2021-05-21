@@ -5,10 +5,10 @@
  */
 package com.jobits.pos.controllers;
 
-import com.jobits.pos.persistence.Area;
-import com.jobits.pos.persistence.Cocina;
-import com.jobits.pos.persistence.Personal;
-import com.jobits.pos.persistence.Venta;
+import com.jobits.pos.core.domain.models.Area;
+import com.jobits.pos.core.domain.models.Cocina;
+import com.jobits.pos.core.domain.models.Personal;
+import com.jobits.pos.core.domain.models.Venta;
 import com.jobits.pos.persistence.models.AreaListModel;
 import com.jobits.pos.persistence.models.DpteListModel;
 import com.jobits.pos.persistence.models.PuntoElaboracionListModel;

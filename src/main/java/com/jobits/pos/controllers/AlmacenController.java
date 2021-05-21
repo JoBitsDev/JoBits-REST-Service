@@ -5,17 +5,17 @@
  */
 package com.jobits.pos.controllers;
 
-import com.jobits.pos.persistence.Almacen;
-import com.jobits.pos.persistence.Insumo;
-import com.jobits.pos.persistence.InsumoAlmacen;
-import com.jobits.pos.persistence.IpvRegistro;
-import com.jobits.pos.persistence.ProductoInsumo;
-import com.jobits.pos.persistence.InsumoAlmacenPK;
-import com.jobits.pos.persistence.Transaccion;
-import com.jobits.pos.persistence.TransaccionEntrada;
-import com.jobits.pos.persistence.TransaccionMerma;
-import com.jobits.pos.persistence.TransaccionSalida;
-import com.jobits.pos.persistence.TransaccionTransformacion;
+import com.jobits.pos.core.domain.models.Almacen;
+import com.jobits.pos.core.domain.models.Insumo;
+import com.jobits.pos.core.domain.models.InsumoAlmacen;
+import com.jobits.pos.core.domain.models.IpvRegistro;
+import com.jobits.pos.core.domain.models.ProductoInsumo;
+import com.jobits.pos.core.domain.models.InsumoAlmacenPK;
+import com.jobits.pos.core.domain.models.Transaccion;
+import com.jobits.pos.core.domain.models.TransaccionEntrada;
+import com.jobits.pos.core.domain.models.TransaccionMerma;
+import com.jobits.pos.core.domain.models.TransaccionSalida;
+import com.jobits.pos.core.domain.models.TransaccionTransformacion;
 import javax.persistence.EntityManager;
 import static com.jobits.utils.R.AUTO_UPDATE_INSUMO_PRICE;
 import com.jobits.utils.utils;

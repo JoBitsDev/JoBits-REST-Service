@@ -1,16 +1,16 @@
 package com.jobits.pos.persistence.models;
 
 import com.jobits.utils.utils;
-import com.jobits.pos.persistence.Cocina;
-import com.jobits.pos.persistence.ProductoVenta;
-import com.jobits.pos.persistence.Area;
-import com.jobits.pos.persistence.Orden;
-import com.jobits.pos.persistence.Venta;
-import com.jobits.pos.persistence.ProductoInsumo;
-import com.jobits.pos.persistence.AsistenciaPersonal;
-import com.jobits.pos.persistence.GastoVenta;
-import com.jobits.pos.persistence.ProductovOrden;
-import com.jobits.pos.persistence.Personal;
+import com.jobits.pos.core.domain.models.Cocina;
+import com.jobits.pos.core.domain.models.ProductoVenta;
+import com.jobits.pos.core.domain.models.Area;
+import com.jobits.pos.core.domain.models.Orden;
+import com.jobits.pos.core.domain.models.Venta;
+import com.jobits.pos.core.domain.models.ProductoInsumo;
+import com.jobits.pos.core.domain.models.AsistenciaPersonal;
+import com.jobits.pos.core.domain.models.GastoVenta;
+import com.jobits.pos.core.domain.models.ProductovOrden;
+import com.jobits.pos.core.domain.models.Personal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;

@@ -5,17 +5,17 @@
  */
 package com.jobits.pos.controllers;
 
-import com.jobits.pos.persistence.Cocina;
-import com.jobits.pos.persistence.TransaccionSalida;
-import com.jobits.pos.persistence.Insumo;
-import com.jobits.pos.persistence.TransaccionMerma;
-import com.jobits.pos.persistence.Almacen;
-import com.jobits.pos.persistence.InsumoAlmacen;
-import com.jobits.pos.persistence.Operacion;
-import com.jobits.pos.persistence.Transaccion;
-import com.jobits.pos.persistence.TransaccionEntrada;
-import com.jobits.pos.persistence.TransaccionTransformacion;
-import com.jobits.pos.persistence.TransaccionTransformacionPK;
+import com.jobits.pos.core.domain.models.Cocina;
+import com.jobits.pos.core.domain.models.TransaccionSalida;
+import com.jobits.pos.core.domain.models.Insumo;
+import com.jobits.pos.core.domain.models.TransaccionMerma;
+import com.jobits.pos.core.domain.models.Almacen;
+import com.jobits.pos.core.domain.models.InsumoAlmacen;
+import com.jobits.pos.core.domain.models.Operacion;
+import com.jobits.pos.core.domain.models.Transaccion;
+import com.jobits.pos.core.domain.models.TransaccionEntrada;
+import com.jobits.pos.core.domain.models.TransaccionTransformacion;
+import com.jobits.pos.core.domain.models.TransaccionTransformacionPK;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import com.jobits.utils.utils;

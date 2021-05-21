@@ -5,7 +5,7 @@
  */
 package com.jobits.pos.controllers;
 
-import com.jobits.pos.persistence.Insumo;
+import com.jobits.pos.core.domain.models.Insumo;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 

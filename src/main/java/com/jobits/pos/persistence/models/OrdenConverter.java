@@ -5,10 +5,10 @@
  */
 package com.jobits.pos.persistence.models;
 
-import com.jobits.pos.persistence.Mesa;
-import com.jobits.pos.persistence.Orden;
-import com.jobits.pos.persistence.ProductoVenta;
-import com.jobits.pos.persistence.ProductovOrden;
+import com.jobits.pos.core.domain.models.Mesa;
+import com.jobits.pos.core.domain.models.Orden;
+import com.jobits.pos.core.domain.models.ProductoVenta;
+import com.jobits.pos.core.domain.models.ProductovOrden;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;

@@ -5,7 +5,7 @@
  */
 package com.jobits.pos.printservice;
 
-import com.jobits.pos.persistence.Configuracion;
+import com.jobits.pos.core.domain.models.Configuracion;
 import com.jobits.pos.service.AbstractFacade;
 import com.jobits.utils.R;
 
