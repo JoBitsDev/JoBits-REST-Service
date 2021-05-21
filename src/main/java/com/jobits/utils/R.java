@@ -5,17 +5,12 @@
  */
 package com.jobits.utils;
 
-import com.jobits.pos.persistence.Configuracion;
-import com.jobits.pos.persistence.Negocio;
-import com.jobits.pos.printservice.Impresion;
-import com.jobits.pos.printservice.Ticket;
+import com.jobits.pos.core.domain.models.Configuracion;
+import com.jobits.pos.core.domain.models.Negocio;
 import com.jobits.pos.service.AbstractFacade;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 /**
  * FirstDream
